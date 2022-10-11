@@ -1,5 +1,7 @@
+
 import * as vscode from 'vscode';
-import getNonce from './getNonce';
+import { NuRequest } from './request/NuRequest';
+
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
 
@@ -57,6 +59,12 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 		const reactAppPathOnDisk = webview.asWebviewUri(
 			vscode.Uri.joinPath(this._extensionUri, 'configViewer', 'configViewer.js')
 		);
+
+		this.getValidator('<img>')
+			.then((response) => {
+				response.data;
+		});
+
 		return `<!DOCTYPE html>
 			<html lang="pt-BR">
 			<head>
@@ -76,5 +84,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 				<script src="${reactAppPathOnDisk}"></script>
 			</body>
 			</html>`;
+	}
+
+	private async getValidator(html: string) {
+		const nuRequest = new NuRequest();
+		return await nuRequest.sendRequest(html);
 	}
 }

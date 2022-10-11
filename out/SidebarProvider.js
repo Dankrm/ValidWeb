@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SidebarProvider = void 0;
 const vscode = require("vscode");
+const NuRequest_1 = require("./request/NuRequest");
 class SidebarProvider {
     constructor(_extensionUri) {
         this._extensionUri = _extensionUri;
@@ -39,6 +40,10 @@ class SidebarProvider {
         const styleResetUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'reset.css'));
         const styleVSCodeUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'vscode.css'));
         const reactAppPathOnDisk = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'configViewer', 'configViewer.js'));
+        this.getValidator('<img>')
+            .then((response) => {
+            response.data;
+        });
         return `<!DOCTYPE html>
 			<html lang="pt-BR">
 			<head>
@@ -58,6 +63,10 @@ class SidebarProvider {
 				<script src="${reactAppPathOnDisk}"></script>
 			</body>
 			</html>`;
+    }
+    async getValidator(html) {
+        const nuRequest = new NuRequest_1.NuRequest();
+        return await nuRequest.sendRequest(html);
     }
 }
 exports.SidebarProvider = SidebarProvider;
