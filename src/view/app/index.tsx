@@ -1,13 +1,12 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./app";
 
-import "./index.css";
-
-interface vscode {
-  postMessage(message: any): void;
-}
-declare const vscode: vscode;
-
-ReactDOM.render(<h1>Tomanocu</h1>, document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+  );
 
 

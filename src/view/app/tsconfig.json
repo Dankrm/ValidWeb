@@ -15,7 +15,8 @@
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
         "experimentalDecorators": true,
-        "composite": true
+        "composite": true,
+        "allowSyntheticDefaultImports": true
     },
     "include": [
         "./**/*"
