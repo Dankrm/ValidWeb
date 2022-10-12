@@ -48,6 +48,12 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 			  case "loaded": {
 				webviewView.webview.postMessage('Extension Knows React is ready');
 				vscode.window.showInformationMessage("AAAAAAAAAAAAAAAAAAAAAAA");
+				break;
+			  }
+			  case "validateApi": {
+				debugger
+				webviewView.webview.postMessage('Extension Knows React is ready');
+				vscode.window.showInformationMessage("AAAAAAAAAAAAAAAAAAAAAAA");
 			  }
 			}
 		  });

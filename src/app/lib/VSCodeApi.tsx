@@ -28,5 +28,5 @@ class VSCodeWrapper {
     }
 }
 
-// Singleton to prevent multiple fetches of VsCodeAPI.
-export const VSCodeAPI: VSCodeWrapper = new VSCodeWrapper();
+// Singleton to prevent multiple fetches of vscodeAPI.
+export const vscodeAPI: VSCodeWrapper = new VSCodeWrapper();

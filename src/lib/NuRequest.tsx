@@ -1,5 +1,5 @@
-const axios = require('axios');
-const https = require('https');
+const axios = require('axios')
+const https = require('node');
 
 const VALIDOR_API = "http://validator.nu/?out=xml";
 export default class NuRequest {

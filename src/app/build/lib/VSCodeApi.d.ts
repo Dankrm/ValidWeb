@@ -12,5 +12,5 @@ declare class VSCodeWrapper {
      */
     onMessage(callback: (message: any) => void): () => void;
 }
-export declare const VSCodeAPI: VSCodeWrapper;
+export declare const vscodeAPI: VSCodeWrapper;
 export {};

@@ -19,9 +19,9 @@
 	"exclude": [
 		"node_modules",
 		".vscode-test",
-		"./src/view/app/"
+		"./src/app/"
 	],
 	"references": [
-		{ "path": "./src/view/app" }
+		{ "path": "./src/app" }
 	]
 }
