@@ -2,10 +2,10 @@ const path = require("path");
 
 module.exports = {
   entry: {
-    build: "./src/view/app/index.tsx"
+    build: "./src/view/app/index.tsx",
   },
   output: {
-    path: path.resolve(__dirname, "build"),
+    path: path.resolve(__dirname, "out"),
     filename: "[name].js"
   },
   devtool: "eval-source-map",
@@ -34,5 +34,6 @@ module.exports = {
   },
   performance: {
     hints: false
-  }
+  },
+  externals: { vscode: 'vscode' }
 };

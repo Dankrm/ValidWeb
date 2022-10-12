@@ -47,6 +47,9 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 				vscode.window.showErrorMessage(data.value);
 				break;
 			  }
+			  case "get-data": {
+				vscode.window.showErrorMessage("AAAAAAAAAAAAAAAAAAAAAAA");
+			  }
 			}
 		  });
 	}
@@ -57,13 +60,16 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 		const styleVSCodeUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'vscode.css'));
 		
 		const reactAppPathOnDisk = webview.asWebviewUri(
-			vscode.Uri.joinPath(this._extensionUri, 'configViewer', 'configViewer.js')
+			vscode.Uri.joinPath(this._extensionUri, 'out', 'build.js')
 		);
 
+		let texto;
 		this.getValidator('<img>')
 			.then((response) => {
-				response.data;
-		});
+				texto = response.data;
+			}).catch((error) => {
+				debugger;
+			});
 
 		return `<!DOCTYPE html>
 			<html lang="pt-BR">
@@ -79,6 +85,13 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 				<link href="${styleVSCodeUri}" rel="stylesheet">
 				<title>ValidWeb</title>
 			</head>
+			<script>
+				const vscode = acquireVsCodeApi();
+				window.onload = function() {
+					vscode.postMessage({ command: 'get-data' });
+					console.log('Pronto.');
+				};
+			</script>
 			<body>
 				<div id="root"></div>
 				<script src="${reactAppPathOnDisk}"></script>

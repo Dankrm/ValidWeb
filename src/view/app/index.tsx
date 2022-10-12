@@ -3,12 +3,11 @@ import * as ReactDOM from "react-dom";
 
 import "./index.css";
 
-declare global {
-  interface Window {
-    acquireVsCodeApi(): any;
-  }
+interface vscode {
+  postMessage(message: any): void;
 }
-ReactDOM.render(
-  <h1>teste</h1>,
-  document.getElementById("root")
-);
+declare const vscode: vscode;
+
+ReactDOM.render(<h1>Tomanocu</h1>, document.getElementById('root'));
+
+
