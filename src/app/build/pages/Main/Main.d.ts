@@ -1,2 +1,2 @@
 /// <reference types="react" />
-export default function main(): JSX.Element;
+export default function Main(): JSX.Element;

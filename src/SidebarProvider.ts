@@ -1,5 +1,7 @@
 
 import * as vscode from 'vscode';
+import NuRequest from './lib/NuRequest';
+import Threatment from './lib/Threatment';
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
 
@@ -45,15 +47,16 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 				vscode.window.showErrorMessage(data.value);
 				break;
 			  }
-			  case "loaded": {
-				webviewView.webview.postMessage('Extension Knows React is ready');
-				vscode.window.showInformationMessage("AAAAAAAAAAAAAAAAAAAAAAA");
-				break;
-			  }
 			  case "validateApi": {
 				debugger
-				webviewView.webview.postMessage('Extension Knows React is ready');
-				vscode.window.showInformationMessage("AAAAAAAAAAAAAAAAAAAAAAA");
+				const threatment = new Threatment();
+				const resposta = await threatment.callApi('<img>')
+				.then((response) => {
+					return response;
+				});
+				debugger;
+				threatment.threatData(resposta.data);
+				break;
 			  }
 			}
 		  });
