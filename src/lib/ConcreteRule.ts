@@ -6,10 +6,8 @@ export default class ConcreteRule implements Rule {
     connectionRule: ConnectionRule | undefined;
     description: string | undefined;
 
-    constructor () {
-
-    }
-
+    constructor () {};
+    
     validate(): boolean {
         return true;
     }

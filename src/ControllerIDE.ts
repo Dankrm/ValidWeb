@@ -1,9 +1,9 @@
 
 import * as vscode from 'vscode';
-import NuRequest from './lib/NuRequest';
-import Threatment from './lib/Threatment';
+import { Validator } from './lib/Validator';
+import { Diagnostic } from './lib/Diagnostic';
 
-export class SidebarProvider implements vscode.WebviewViewProvider {
+export class ControllerIDE implements vscode.WebviewViewProvider {
 
 	public static readonly viewType = 'validweb-sidebar';
 
@@ -48,14 +48,16 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 				break;
 			  }
 			  case "validateApi": {
-				debugger
-				const threatment = new Threatment();
-				const resposta = await threatment.callApi('<img>')
-				.then((response) => {
-					return response;
-				});
-				debugger;
-				threatment.threatData(resposta.data);
+				const validator = Validator.getInstance();
+				const editor = vscode.window.activeTextEditor;
+				if (editor) {
+					let document = editor.document;
+					const documentText = document.getText();
+					validator.requestDataToThreatment(documentText);
+
+					
+				}
+
 				break;
 			  }
 			}

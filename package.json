@@ -10,8 +10,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:validweb.teste",
-    "onView:validweb-sidebar"
+    "onView:validweb-sidebar",
+    "onLanguage:html"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -34,13 +34,7 @@
           "contextualTitle": "ValidWeb"
         }
       ]
-    },
-    "commands": [
-      {
-        "command": "validweb.teste",
-        "title": "Hello World"
-      }
-    ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "yarn run compile",
@@ -83,6 +77,6 @@
     "webpack-cli": "^4.10.0"
   },
   "dependencies": {
-    "xml-js": "^1.6.11"
+    "xml2js": "^0.4.23"
   }
 }
