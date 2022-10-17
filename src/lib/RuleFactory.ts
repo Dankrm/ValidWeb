@@ -26,12 +26,10 @@ export default class RuleFactory {
             const errorRules = this.buildMessages(json.MESSAGES.ERROR, new RuleType('error'));
             errorRules.forEach(rules.add, rules);
         }
-
         if (json.MESSAGES.INFO) {
             const infoRules = this.buildMessages(json.MESSAGES.ERROR, new RuleType('info')); 
             infoRules.forEach(rules.add, rules);
         }
-        debugger;
         return rules;
     }
 
@@ -39,8 +37,6 @@ export default class RuleFactory {
         const rules = new Set<Rule>;
         outerMessages.forEach((outerMessage: any) => {
             try {
-                debugger
-
                 const filteredMessage = outerMessage.MESSAGE[0];
 
                 let message = '';
@@ -52,31 +48,36 @@ export default class RuleFactory {
                     const rule = new ConcreteRule();
                     const connectionRule = new ConnectionRule();
                     const chainingType = this.classifyMessage(String(message).toLocaleLowerCase());
+                    connectionRule.setChainingType(chainingType);
+
+                    rule.setRuleType(ruleType);
+                    rule.setConnectionRule(connectionRule);
+
+                    let elementToValidate = null;
+                    let validation = null;
 
                     if (connectionRule !== null) {
-                        if (filteredMessage.A[0].CODE[0]) {
-                            let elementToValidate = filteredMessage.A[0].CODE[0];
-                            connectionRule.setBasedElement(elementToValidate);
-                        }
-                        if (filteredMessage.CODE[0]) {
-                            let validation = filteredMessage.CODE[0];
-
-                            if (chainingType.isAttribute()) {
-                                rule.addAttribute(validation);
+                        if (!elementToValidate && filteredMessage.A && filteredMessage.A[0].CODE && filteredMessage.A[0].CODE[0]) {
+                            elementToValidate = filteredMessage.A[0].CODE[0];
+                        } else {
+                            if (filteredMessage.CODE.length > 1) {
+                                elementToValidate = filteredMessage.CODE[0];
+                                validation = filteredMessage.CODE[1];
                             } else {
-                                connectionRule.setValidationElement(validation);
+                                validation = filteredMessage.CODE[0];
                             }
                         }
-
-                        connectionRule.setChainingType(chainingType);
-
-                        rule.setConnectionRule(connectionRule);
-                        rule.setRuleType(ruleType);
+                        if (!validation && filteredMessage.CODE[0] && filteredMessage.CODE) {
+                            validation = filteredMessage.CODE[0];
+                        }
+                        
+                        connectionRule.setBasedElement(elementToValidate);
+                        rule.setValidationElement(validation);
                         rules.add(rule);
                     }
                 }
             } catch (error) {
-                debugger
+                console.error(error);
             }
         });
         return rules;

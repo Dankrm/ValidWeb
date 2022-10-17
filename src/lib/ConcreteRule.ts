@@ -5,7 +5,7 @@ import { RuleType } from "./RuleType";
 
 
 export default class ConcreteRule implements Rule {
-    attributes: Set<string> | undefined;
+    attributes: Set<string> = new Set<string>;
     connectionRule: ConnectionRule | undefined;
     description: string | undefined;
     ruleType: RuleType | undefined;
@@ -34,6 +34,18 @@ export default class ConcreteRule implements Rule {
 
     removeAttribute (attribute: string) {
         this.attributes?.delete(attribute);
+    }
+
+    setBasedElement(basedElement: string) {
+        this.connectionRule?.setBasedElement(basedElement);
+    }
+
+    setValidationElement(validationElement: string) {
+        if (this.connectionRule?.getChainingType()?.isAttribute()) {
+            this.addAttribute(validationElement);
+        } else {
+            this.connectionRule?.setValidationElement(validationElement);
+        }
     }
 
     validate(): boolean {

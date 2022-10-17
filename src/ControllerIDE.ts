@@ -10,7 +10,7 @@ export class ControllerIDE implements vscode.WebviewViewProvider {
 	private _view?: vscode.WebviewView;
 
 	constructor(
-		private readonly _extensionUri: vscode.Uri,
+		private readonly extensionContext: vscode.ExtensionContext,
 	) { }
 
 	public resolveWebviewView(
@@ -25,7 +25,7 @@ export class ControllerIDE implements vscode.WebviewViewProvider {
 			enableScripts: true,
 
 			localResourceRoots: [
-				this._extensionUri
+				this.extensionContext.extensionUri
 			]
 		};
 
@@ -54,9 +54,11 @@ export class ControllerIDE implements vscode.WebviewViewProvider {
 					let document = editor.document;
 					const documentText = document.getText();
 					validator.requestDataToThreatment(documentText);
-
-					
 				}
+
+				const htmlDiagnostics = vscode.languages.createDiagnosticCollection("validweb");
+				this.extensionContext.subscriptions.push(htmlDiagnostics);
+				Diagnostic.getInstance().subscribeToDocumentChanges(this.extensionContext, htmlDiagnostics);
 
 				break;
 			  }
@@ -66,11 +68,11 @@ export class ControllerIDE implements vscode.WebviewViewProvider {
 
 	private _getHtmlForWebview(webview: vscode.Webview) {
 		
-		const styleResetUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'reset.css'));
-		const styleVSCodeUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'vscode.css'));
+		const styleResetUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionContext.extensionUri, 'media', 'reset.css'));
+		const styleVSCodeUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionContext.extensionUri, 'media', 'vscode.css'));
 		
 		const reactAppPathOnDisk = webview.asWebviewUri(
-			vscode.Uri.joinPath(this._extensionUri, 'out', 'build.js')
+			vscode.Uri.joinPath(this.extensionContext.extensionUri, 'out', 'build.js')
 		);
 
 		return `<!DOCTYPE html>

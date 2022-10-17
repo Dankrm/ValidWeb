@@ -5,20 +5,27 @@ import Threatment from "./Threatment";
 export class Validator {
     private static instance: Validator;
     private threatment: Threatment = Threatment.getInstance();
-    private ruleList : Set<Rule> | undefined;
+    private ruleSet : Set<Rule>;
 
-    private constructor () {}
+    private constructor (ruleSet : Set<Rule>) {
+        this.ruleSet = ruleSet;
+    }
 
     public static getInstance(): Validator {
         if (!Validator.instance) {
-            Validator.instance = new Validator();
+            Validator.instance = new Validator(new Set<Rule>);
         }
         return Validator.instance;
     }
 
-    requestDataToThreatment (html: string) {
+    public getRuleSet () {
+        return this.ruleSet;
+    }
+
+    public requestDataToThreatment (html: string) {
         this.threatment.callApi(html).then((response)=>{
             const threatedData = this.threatment.threatData(response);
+            threatedData.forEach(this.ruleSet.add, this.ruleSet);
         });
     }
 }

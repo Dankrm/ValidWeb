@@ -4,8 +4,8 @@ import { ChainingType } from "./ChainingType";
 
 export default class ConnectionRule {
     private chainingType : ChainingType | undefined;
-    private basedElement : string | undefined;
-    private validationElement : string | undefined;
+    private basedElement : string = '';
+    private validationElement : string = '';
 
     constructor () {};
 
@@ -15,13 +15,13 @@ export default class ConnectionRule {
     setChainingType(chainingType: ChainingType) {
         this.chainingType = chainingType;
     }
-    getBasedElement(): string | undefined {
+    getBasedElement(): string {
         return this.basedElement;
     }
     setBasedElement(basedElement: string) {
         this.basedElement = basedElement;
     }
-    getValidationElement(): string | undefined {
+    getValidationElement(): string {
         return this.validationElement;
     }
     setValidationElement(validationElement: string) {
