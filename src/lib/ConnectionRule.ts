@@ -1,10 +1,11 @@
+import { DOMElement, HTMLAttributes } from "react";
 import { ChainingType } from "./ChainingType";
 
 
 export default class ConnectionRule {
     private chainingType : ChainingType | undefined;
-    private basedElement : Element | undefined;
-    private validationElement : Element | undefined;
+    private basedElement : string | undefined;
+    private validationElement : string | undefined;
 
     constructor () {};
 
@@ -14,16 +15,16 @@ export default class ConnectionRule {
     setChainingType(chainingType: ChainingType) {
         this.chainingType = chainingType;
     }
-    getBasedElement(): Element | undefined {
+    getBasedElement(): string | undefined {
         return this.basedElement;
     }
-    setBasedElement(basedElement: Element) {
+    setBasedElement(basedElement: string) {
         this.basedElement = basedElement;
     }
-    getValidationElement(): Element | undefined {
+    getValidationElement(): string | undefined {
         return this.validationElement;
     }
-    setValidationElement(validationElement: Element) {
+    setValidationElement(validationElement: string) {
         this.validationElement = validationElement;
     }
 

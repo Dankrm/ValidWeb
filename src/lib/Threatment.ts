@@ -32,8 +32,8 @@ export default class Threatment {
             strict: false
         };
 
-        return parseString(json.data, options,(err: any, result: any) => {
-            return (new RuleFactory()).gerar(result);
+        return parseString(json.data, options, (err: any, result: any) => {
+            return (new RuleFactory()).factory(result);
         });
     }
 }
