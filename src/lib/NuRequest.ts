@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const VALIDOR_API = "http://validator.nu/?out=xml";
+const VALIDOR_API = "https://validator.nu/?out=json";
 export default class NuRequest {
     private static instance: NuRequest;
     private axiosInstance;
@@ -19,9 +19,10 @@ export default class NuRequest {
     }
 
     public sendRequest = (html: string): Promise<any> => {
+        const filteredHtml = String(html).replaceAll('\"', '\'');
         return this.axiosInstance.post(
             VALIDOR_API, 
-            {'content': html}
+            {content: filteredHtml}
         );
     };
 }

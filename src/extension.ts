@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { ControllerIDE } from './ControllerIDE';
 import { HtmlCodeActionProvider } from './HtmlCodeActionProvider';
+import { Diagnostic } from './lib/Diagnostic';
 
 
 export function activate(context: vscode.ExtensionContext) {
@@ -15,6 +16,10 @@ export function activate(context: vscode.ExtensionContext) {
 			providedCodeActionKinds: HtmlCodeActionProvider.providedCodeActionKinds
 		})
 	);
+
+	const htmlDiagnostics = vscode.languages.createDiagnosticCollection("validweb");
+	context.subscriptions.push(htmlDiagnostics);
+	Diagnostic.getInstance().subscribeToDocumentChanges(context, htmlDiagnostics);
 
 }
 

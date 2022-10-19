@@ -8,7 +8,7 @@ export class ChainingType {
         this.messageCode = messageCode;
     }
 
-    getMessageCode(): string{
+    getMessageCode(): string {
         return this.messageCode;
     }
 

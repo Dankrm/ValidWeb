@@ -6,11 +6,15 @@ import { RuleType } from "./RuleType";
 
 export default class ConcreteRule implements Rule {
     attributes: Set<string> = new Set<string>;
-    connectionRule: ConnectionRule | undefined;
-    description: string | undefined;
-    ruleType: RuleType | undefined;
+    connectionRule: ConnectionRule;
+    description: string;
+    ruleType: RuleType;
 
-    constructor () {}
+    constructor (connectionRule: ConnectionRule, description: string, ruleType: RuleType) {
+        this.connectionRule = connectionRule;
+        this.description = description;
+        this.ruleType = ruleType;
+    }
 
     getConnectionRule(): ConnectionRule | undefined {
         return this.connectionRule;

@@ -33,32 +33,8 @@ export class ControllerIDE implements vscode.WebviewViewProvider {
 
 		webviewView.webview.onDidReceiveMessage(async (data) => {
 			switch (data.type) {
-			  case "onInfo": {
-				if (!data.value) {
-				  return;
-				}
-				vscode.window.showInformationMessage(data.value);
-				break;
-			  }
-			  case "onError": {
-				if (!data.value) {
-				  return;
-				}
-				vscode.window.showErrorMessage(data.value);
-				break;
-			  }
 			  case "validateApi": {
-				const validator = Validator.getInstance();
-				const editor = vscode.window.activeTextEditor;
-				if (editor) {
-					let document = editor.document;
-					const documentText = document.getText();
-					validator.requestDataToThreatment(documentText);
-				}
 
-				const htmlDiagnostics = vscode.languages.createDiagnosticCollection("validweb");
-				this.extensionContext.subscriptions.push(htmlDiagnostics);
-				Diagnostic.getInstance().subscribeToDocumentChanges(this.extensionContext, htmlDiagnostics);
 
 				break;
 			  }

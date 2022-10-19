@@ -1,17 +1,31 @@
-import { createElement } from "react";
+import { DiagnosticSeverity } from "vscode";
 import { ChainingType } from "./ChainingType";
 import ConcreteRule from "./ConcreteRule";
 import ConnectionRule from "./ConnectionRule";
 import Rule from "./Rule";
 import { RuleType } from "./RuleType";
+import * as vscode from 'vscode';
+
+type IValidatorMessage = {
+    extract: string
+    firstColumn: number
+    hiliteLength: number
+    hiliteStart: number
+    lastColumn: number
+    lastLine: number
+    message: string
+    type: string
+};
 
 export const chainingTypes = {
+    doctype: new ChainingType("doctype", "Non-space characters found without seeing a doctype first"),
     attribute: new ChainingType("attribute", "is missing required attribute"),
     attributeOptional: new ChainingType("attributeOptional", "attribute, except under certain conditions"),
+    attributeShould: new ChainingType("attributeShould", "Consider adding a"),
     children: new ChainingType("children", "is missing a required instance of child element"),
-    parent: new ChainingType("parent", "parent"),
-    sibling: new ChainingType("sibling", "sibling"),
-    order: new ChainingType("order", "order"),
+    childrenNotAllowed: new ChainingType("childrenNotAllowed", "not allowed as child of element"),
+    childrenNotAppear: new ChainingType("childrenNotAppear", "must not appear as a descendant of the"),
+    headingEmpty: new ChainingType("headingEmpty", "Empty heading"),
     unclosed: new ChainingType("unclosed", "Unclosed element"),
     expected: new ChainingType("expected", "expected"),
 };
@@ -21,66 +35,57 @@ export default class RuleFactory {
     constructor () {}
 
     factory (json : any): Set<Rule> {
-        const rules = new Set<Rule>;
-        if (json.MESSAGES.ERROR) {
-            const errorRules = this.buildMessages(json.MESSAGES.ERROR, new RuleType('error'));
-            errorRules.forEach(rules.add, rules);
-        }
-        if (json.MESSAGES.INFO) {
-            const infoRules = this.buildMessages(json.MESSAGES.ERROR, new RuleType('info')); 
-            infoRules.forEach(rules.add, rules);
-        }
-        return rules;
-    }
-
-    buildMessages (outerMessages: any, ruleType: RuleType): Set<Rule> {
-        const rules = new Set<Rule>;
-        outerMessages.forEach((outerMessage: any) => {
-            try {
-                const filteredMessage = outerMessage.MESSAGE[0];
-
-                let message = '';
-                if (filteredMessage._) {
-                    message = filteredMessage._;
-                }
-                
-                if (message) {
-                    const rule = new ConcreteRule();
-                    const connectionRule = new ConnectionRule();
-                    const chainingType = this.classifyMessage(String(message).toLocaleLowerCase());
-                    connectionRule.setChainingType(chainingType);
-
-                    rule.setRuleType(ruleType);
-                    rule.setConnectionRule(connectionRule);
-
-                    let elementToValidate = null;
-                    let validation = null;
-
-                    if (connectionRule !== null) {
-                        if (!elementToValidate && filteredMessage.A && filteredMessage.A[0].CODE && filteredMessage.A[0].CODE[0]) {
-                            elementToValidate = filteredMessage.A[0].CODE[0];
-                        } else {
-                            if (filteredMessage.CODE.length > 1) {
-                                elementToValidate = filteredMessage.CODE[0];
-                                validation = filteredMessage.CODE[1];
-                            } else {
-                                validation = filteredMessage.CODE[0];
-                            }
-                        }
-                        if (!validation && filteredMessage.CODE[0] && filteredMessage.CODE) {
-                            validation = filteredMessage.CODE[0];
-                        }
-                        
-                        connectionRule.setBasedElement(elementToValidate);
-                        rule.setValidationElement(validation);
-                        rules.add(rule);
-                    }
-                }
-            } catch (error) {
-                console.error(error);
+        let rules = new Set<Rule>;
+        json.data.messages.forEach((outerMessage: any) => {
+            const rule = this.buildRule(outerMessage);
+            if (rule) {
+                rules.add(rule);
             }
         });
         return rules;
+    }
+
+    buildRule (outerMessage: IValidatorMessage): Rule | undefined {
+        try {
+            const message = outerMessage.message;
+            if (message) {
+                const chainingType = this.classifyMessage(String(message).toLocaleLowerCase());
+                const connectionRule = new ConnectionRule(chainingType);
+
+                const [elementToValidate, validation] = this.searchForElements(message);
+
+                if (connectionRule !== null) {
+                    const rule = new ConcreteRule(connectionRule, message, this.classifyRuleType(outerMessage));
+                    rule.setBasedElement(elementToValidate);
+                    rule.setValidationElement(validation);
+
+                    return rule;
+                }
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    searchForElements (message: string): [string, string] {
+        let elementToValidate = '';
+        let validation = '';
+        let found = 0;
+        let foundCount = 0;
+
+        while ((found = message.indexOf("“", found)) !== -1) {
+            if (foundCount === 0) {
+                elementToValidate = message.substring(++found, message.indexOf("”", found + 1));
+                foundCount++;
+            } else if (foundCount === 1) {
+                validation = message.substring(++found, message.indexOf("”", found + 1));
+                foundCount++;
+            } else {
+                break;
+            }
+        }
+
+        return [elementToValidate, validation];
     }
 
     classifyMessage (message: string): ChainingType {      
@@ -91,6 +96,20 @@ export default class RuleFactory {
             }
         });
         return result !== null ? result : chainingTypes.expected;
+    }
+
+    classifyRuleType (outerMessage: any): RuleType {      
+        switch (outerMessage.type) {
+            case 'error': {
+                return new RuleType('Erro', vscode.DiagnosticSeverity.Error);
+            }
+            case 'info': {
+                return new RuleType('Informação', vscode.DiagnosticSeverity.Information);
+            }
+            default: {
+                return new RuleType('Alerta', vscode.DiagnosticSeverity.Warning);
+            }
+        }
     }
 
 

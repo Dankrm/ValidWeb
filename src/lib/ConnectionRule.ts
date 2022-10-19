@@ -3,13 +3,15 @@ import { ChainingType } from "./ChainingType";
 
 
 export default class ConnectionRule {
-    private chainingType : ChainingType | undefined;
+    private chainingType : ChainingType;
     private basedElement : string = '';
     private validationElement : string = '';
 
-    constructor () {};
+    constructor (chainingType: ChainingType) {
+        this.chainingType = chainingType;
+    };
 
-    getChainingType(): ChainingType | undefined {
+    getChainingType(): ChainingType {
         return this.chainingType;
     }
     setChainingType(chainingType: ChainingType) {

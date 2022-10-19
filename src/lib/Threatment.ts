@@ -26,14 +26,6 @@ export default class Threatment {
     }
 
     threatData (json: any): Set<Rule> {
-        const options = {
-            trim: true,
-            ignoreAttrs: true,
-            strict: false
-        };
-
-        return parseString(json.data, options, (err: any, result: any) => {
-            return (new RuleFactory()).factory(result);
-        });
+        return (new RuleFactory()).factory(json);
     }
 }
