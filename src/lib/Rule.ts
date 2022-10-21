@@ -8,4 +8,5 @@ export default interface Rule {
     connectionRule: ConnectionRule;
     ruleType: RuleType;
     validate() : boolean;
+    constructQuerySelector() : [string, string];
 }

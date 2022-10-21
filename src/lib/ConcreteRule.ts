@@ -44,12 +44,48 @@ export default class ConcreteRule implements Rule {
         this.connectionRule?.setBasedElement(basedElement);
     }
 
+    getValidationElement(): string {
+        let response = '';
+        if (this.connectionRule.getChainingType().isAttribute()) {
+             this.attributes.forEach(element => {
+                response = element;
+            });
+        } else {
+            response = this.connectionRule.getValidationElement();
+        }
+        return response;
+    }
+
     setValidationElement(validationElement: string) {
-        if (this.connectionRule?.getChainingType()?.isAttribute()) {
+        if (this.connectionRule.getChainingType().isAttribute()) {
             this.addAttribute(validationElement);
         } else {
-            this.connectionRule?.setValidationElement(validationElement);
+            this.connectionRule.setValidationElement(validationElement);
         }
+    }
+
+    constructQuerySelector (): [string, string] {
+        let query = '';
+        let tem = '';
+        let naoTem = '';
+
+        if (this.connectionRule.getChainingType().getInvalidation() !== '') {
+            query = this.connectionRule.getChainingType().getInvalidation();
+
+            if (this.connectionRule.getBasedElement() !== ''){
+                query = query.replaceAll('x', this.connectionRule.getBasedElement());
+            }
+
+            if (this.connectionRule.getValidationElement() !== ''){
+                query = query.replaceAll('y', this.getValidationElement());
+            }
+
+            [tem, naoTem] = query.split('$');
+        } else {
+
+        }
+
+        return [tem, naoTem];
     }
 
     validate(): boolean {

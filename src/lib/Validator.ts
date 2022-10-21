@@ -24,9 +24,13 @@ export class Validator {
 
     async requestDataToThreatment (html: string) {
         this.ruleSet = new Set<Rule>;
-        await this.threatment.callApi(html).then((response)=>{
-            const threatedData = this.threatment.threatData(response);
-            threatedData.forEach(this.ruleSet.add, this.ruleSet);
-        });
+        try {
+            await this.threatment.callApi(html).then((response)=>{
+                const threatedData = this.threatment.threatData(response);
+                threatedData.forEach(this.ruleSet.add, this.ruleSet);
+            });
+        } catch (error) {
+            console.error(error);
+        }
     }
 }

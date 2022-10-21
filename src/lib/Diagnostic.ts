@@ -23,28 +23,64 @@ export class Diagnostic {
 	}
 
 	private refreshDiagnostics(doc: vscode.TextDocument, htmlDiagnostics: vscode.DiagnosticCollection, ruleSet: Set<Rule>): void {
-		const jsdom = new JSDOM(doc.getText());
+		const jsdom = new JSDOM(doc.getText(), { includeNodeLocations: true });
 		const document = jsdom.window.document;
+	
 		ruleSet.forEach(rule => {
-			for (let lineIndex = 0; lineIndex < doc.lineCount; lineIndex++) {
-				const lineOfText = doc.lineAt(lineIndex);
-				const basedElement = rule.connectionRule?.getBasedElement();
-				const validation = rule.connectionRule?.getValidationElement();
-				if (basedElement && basedElement !== '' && lineOfText.text.includes(basedElement)) {
-					this.diagnostics.push(this.createDiagnostic(doc, lineOfText, lineIndex, rule));
+			debugger
+			try {
+				const selector = rule.constructQuerySelector();
+				if (selector[0]) {
+					const foundElements = document.querySelectorAll(selector[0]);
+					if (selector[1]) {
+						foundElements.forEach((found: HTMLElement) => {
+							const foundElement = jsdom.nodeLocation(found);
+							if (foundElement) {
+								if (selector[1].includes('>')) {
+									selector[1] = selector[1].replace('>', '');
+									let childrenfound = false;
+									found.childNodes.forEach( children => {
+										if (children.nodeName === selector[1]) {
+											childrenfound = true;
+										}
+									});
+									!childrenfound ? this.diagnostics.push(this.createDiagnostic(foundElement.startLine - 1, foundElement.startCol, rule)) : "";
+								} else if (selector[1].includes('[')) {
+									selector[1] = selector[1].replaceAll('[', '').replaceAll(']', '');
+									let attributefound = false;
+									found.getAttributeNames().forEach(attribute => {
+										if (attribute === selector[1]) {
+											attributefound = true;
+										}
+									});
+									!attributefound ? this.diagnostics.push(this.createDiagnostic(foundElement.startLine - 1, foundElement.startCol, rule)) : "";
+								}
+							} else {
+								//sugestão para criar
+							}
+						});
+
+					} else {
+						foundElements.forEach((found: HTMLElement) => {
+							const foundElement = jsdom.nodeLocation(found);
+
+							this.diagnostics.push(this.createDiagnostic(foundElement.startLine - 1, foundElement.startCol, rule));
+						});
+					} 
+				} else {
+					//fazer opeerações de sugestão ou mesnsagem
 				}
+			} catch (error) {
+				console.log(error);
 			}
 		});
 
 		htmlDiagnostics.set(doc.uri, this.diagnostics);
 	}
 
-	private createDiagnostic(doc: vscode.TextDocument, lineOfText: vscode.TextLine, lineIndex: number, rule: Rule): vscode.Diagnostic {
-		const element = rule.connectionRule?.getBasedElement() || rule.connectionRule?.getValidationElement();
-		const index = lineOfText.text.indexOf(element);
-		const range = new vscode.Range(lineIndex, index, lineIndex, index + element.length);
-		const diagnostic = new vscode.Diagnostic(range, rule.connectionRule.getChainingType().getMessageCode(),
-		rule.ruleType.getDiagnostic());
+	private createDiagnostic(line: number, column: number, rule: Rule): vscode.Diagnostic {
+		const range = new vscode.Range(line, column, line, column + rule.connectionRule.getBasedElement().length);
+		const diagnostic = new vscode.Diagnostic(range, rule.connectionRule.getChainingType().getMessageCode(), rule.ruleType.getDiagnostic());
 		diagnostic.code = errorMention;
 		return diagnostic;
 	}

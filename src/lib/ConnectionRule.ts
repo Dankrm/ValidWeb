@@ -1,6 +1,4 @@
-import { DOMElement, HTMLAttributes } from "react";
 import { ChainingType } from "./ChainingType";
-
 
 export default class ConnectionRule {
     private chainingType : ChainingType;
@@ -30,7 +28,7 @@ export default class ConnectionRule {
         this.validationElement = validationElement;
     }
 
-    validate () {
+    getvalidate () {
         
     }
 }

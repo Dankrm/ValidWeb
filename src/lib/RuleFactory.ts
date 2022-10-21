@@ -18,16 +18,17 @@ type IValidatorMessage = {
 };
 
 export const chainingTypes = {
-    doctype: new ChainingType("doctype", "Non-space characters found without seeing a doctype first"),
-    attribute: new ChainingType("attribute", "is missing required attribute"),
-    attributeOptional: new ChainingType("attributeOptional", "attribute, except under certain conditions"),
-    attributeShould: new ChainingType("attributeShould", "Consider adding a"),
-    children: new ChainingType("children", "is missing a required instance of child element"),
-    childrenNotAllowed: new ChainingType("childrenNotAllowed", "not allowed as child of element"),
-    childrenNotAppear: new ChainingType("childrenNotAppear", "must not appear as a descendant of the"),
-    headingEmpty: new ChainingType("headingEmpty", "Empty heading"),
-    unclosed: new ChainingType("unclosed", "Unclosed element"),
-    expected: new ChainingType("expected", "expected"),
+    doctype: new ChainingType("doctype", "non-space characters found without seeing a doctype first", "$x"),
+    attribute: new ChainingType("attribute", "is missing required attribute", "x$[y]"),
+    attributeOptional: new ChainingType("attributeOptional", "attribute, except under certain conditions", "x$[y]"),
+    attributeShould: new ChainingType("attributeShould", "consider adding a", "x$[y]"),
+    attributeEmpty: new ChainingType("attributeEmpty", "bad value “” for attribute", "y$[x]"),
+    children: new ChainingType("children", "is missing a required instance of child element", "x$>y"),
+    childrenNotAllowed: new ChainingType("childrenNotAllowed", "not allowed as child of element", "y>x"),
+    childrenNotAppear: new ChainingType("childrenNotAppear", "must not appear as a descendant of the", "y>x"),
+    headingEmpty: new ChainingType("headingEmpty", "empty heading", "x?"),
+    unclosed: new ChainingType("unclosed", "unclosed element", "$/>"),
+    expected: new ChainingType("expected", "expected", "$x"),
 };
 
 export default class RuleFactory {
@@ -74,14 +75,18 @@ export default class RuleFactory {
         let foundCount = 0;
 
         while ((found = message.indexOf("“", found)) !== -1) {
-            if (foundCount === 0) {
-                elementToValidate = message.substring(++found, message.indexOf("”", found + 1));
-                foundCount++;
-            } else if (foundCount === 1) {
-                validation = message.substring(++found, message.indexOf("”", found + 1));
-                foundCount++;
+            if (message.substring(found + 1, found + 2) !== '”') {
+                if (foundCount === 0) {
+                    elementToValidate = message.substring(++found, message.indexOf("”", found));
+                    foundCount++;
+                } else if (foundCount === 1) {
+                    validation = message.substring(++found, message.indexOf("”", found));
+                    foundCount++;
+                } else {
+                    break;
+                }
             } else {
-                break;
+                found++;
             }
         }
 
