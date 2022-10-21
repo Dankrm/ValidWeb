@@ -27,7 +27,6 @@ export class Diagnostic {
 		const document = jsdom.window.document;
 	
 		ruleSet.forEach(rule => {
-			debugger
 			try {
 				const selector = rule.constructQuerySelector();
 				if (selector[0]) {
@@ -80,7 +79,7 @@ export class Diagnostic {
 
 	private createDiagnostic(line: number, column: number, rule: Rule): vscode.Diagnostic {
 		const range = new vscode.Range(line, column, line, column + rule.connectionRule.getBasedElement().length);
-		const diagnostic = new vscode.Diagnostic(range, rule.connectionRule.getChainingType().getMessageCode(), rule.ruleType.getDiagnostic());
+		const diagnostic = new vscode.Diagnostic(range, rule.description, rule.ruleType.getDiagnostic());
 		diagnostic.code = errorMention;
 		return diagnostic;
 	}

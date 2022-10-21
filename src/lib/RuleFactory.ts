@@ -22,7 +22,7 @@ export const chainingTypes = {
     attribute: new ChainingType("attribute", "is missing required attribute", "x$[y]"),
     attributeOptional: new ChainingType("attributeOptional", "attribute, except under certain conditions", "x$[y]"),
     attributeShould: new ChainingType("attributeShould", "consider adding a", "x$[y]"),
-    attributeEmpty: new ChainingType("attributeEmpty", "bad value “” for attribute", "y$[x]"),
+    attributeEmpty: new ChainingType("attributeEmpty", "bad value “” for attribute", "x$[y]"),
     children: new ChainingType("children", "is missing a required instance of child element", "x$>y"),
     childrenNotAllowed: new ChainingType("childrenNotAllowed", "not allowed as child of element", "y>x"),
     childrenNotAppear: new ChainingType("childrenNotAppear", "must not appear as a descendant of the", "y>x"),
@@ -53,7 +53,7 @@ export default class RuleFactory {
                 const chainingType = this.classifyMessage(String(message).toLocaleLowerCase());
                 const connectionRule = new ConnectionRule(chainingType);
 
-                const [elementToValidate, validation] = this.searchForElements(message);
+                const [elementToValidate, validation] = this.searchForElements(message.toLowerCase());
 
                 if (connectionRule !== null) {
                     const rule = new ConcreteRule(connectionRule, message, this.classifyRuleType(outerMessage));
@@ -73,22 +73,28 @@ export default class RuleFactory {
         let validation = '';
         let found = 0;
         let foundCount = 0;
+        let searchWords = ['element', 'attribute', 'expected'];
+        let searchSlashes = ['“', '”'];
 
-        while ((found = message.indexOf("“", found)) !== -1) {
-            if (message.substring(found + 1, found + 2) !== '”') {
-                if (foundCount === 0) {
-                    elementToValidate = message.substring(++found, message.indexOf("”", found));
-                    foundCount++;
-                } else if (foundCount === 1) {
-                    validation = message.substring(++found, message.indexOf("”", found));
-                    foundCount++;
-                } else {
-                    break;
+        searchWords.forEach( word => {      
+            while ((found = message.indexOf(word, found)) !== -1 && foundCount < 2) {
+                if (message.charAt(found + word.length + 1) === searchSlashes[0]) {
+                    if (foundCount === 0) {
+                        elementToValidate = message.substring(found + word.length + 2, message.indexOf(searchSlashes[1], found + word.length + 2)); 
+                    } else {
+                        validation = message.substring(found + word.length + 2, message.indexOf(searchSlashes[1], found + word.length + 2)); 
+                    }
+                } else if (message.charAt(found - 2) === searchSlashes[1]) {
+                    if (foundCount === 0) {
+                        elementToValidate = message.substring(message.lastIndexOf(searchSlashes[0], found) + 1, found - 2); 
+                    } else {
+                        validation = message.substring(message.lastIndexOf(searchSlashes[0], found) + 1, found - 2); 
+                    }
                 }
-            } else {
                 found++;
+                foundCount++;
             }
-        }
+        });
 
         return [elementToValidate, validation];
     }

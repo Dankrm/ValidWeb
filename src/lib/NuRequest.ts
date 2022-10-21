@@ -21,7 +21,7 @@ export default class NuRequest {
         
         const config = {
             headers: { 
-              'Content-Type': "Content-type: text/html",
+              'Content-Type': "Content-type: text/html; charset=utf-8",
             },
             httpsAgent: new https.Agent({ rejectUnauthorized: false })
           };
