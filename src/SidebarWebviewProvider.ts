@@ -1,11 +1,9 @@
 
 import * as vscode from 'vscode';
-import { Validator } from './lib/Validator';
-import { Diagnostic } from './lib/Diagnostic';
 
-export class ControllerIDE implements vscode.WebviewViewProvider {
+export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
 
-	public static readonly viewType = 'validweb-sidebar';
+	public static readonly viewType = 'validweb-sidebar-webview';
 
 	private _view?: vscode.WebviewView;
 

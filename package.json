@@ -27,11 +27,16 @@
     "views": {
       "validweb-sidebar-view": [
         {
+          "type": "tree",
+          "id": "validweb-sidebar-tree",
+          "name": "Arquivos",
+          "contextualTitle": "Arquivos"
+        },
+        {
           "type": "webview",
-          "id": "validweb-sidebar",
-          "name": "ValidWeb",
-          "icon": "media/edit.svg",
-          "contextualTitle": "ValidWeb"
+          "id": "validweb-sidebar-webview",
+          "name": "Marcadores",
+          "contextualTitle": "Marcadores"
         }
       ]
     }
@@ -78,6 +83,8 @@
   },
   "dependencies": {
     "jsdom": "^20.0.1",
+    "sequelize": "^6.25.3",
+    "sqlite3": "^5.1.2",
     "xml2js": "^0.4.23"
   }
 }

@@ -27,8 +27,4 @@ export default class ConnectionRule {
     setValidationElement(validationElement: string) {
         this.validationElement = validationElement;
     }
-
-    getvalidate () {
-        
-    }
 }

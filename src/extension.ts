@@ -1,14 +1,15 @@
 import * as vscode from 'vscode';
-import { ControllerIDE } from './ControllerIDE';
+import { SidebarWebviewProvider } from './SidebarWebviewProvider';
 import { HtmlCodeActionProvider } from './HtmlCodeActionProvider';
 import { Diagnostic } from './lib/Diagnostic';
 
 
 export function activate(context: vscode.ExtensionContext) {
-	const provider = new ControllerIDE(context);
+
+	const provider = new SidebarWebviewProvider(context);
 
 	context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider(ControllerIDE.viewType, provider)
+		vscode.window.registerWebviewViewProvider(SidebarWebviewProvider.viewType, provider)
 	);
 
 	context.subscriptions.push(
