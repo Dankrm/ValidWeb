@@ -3,20 +3,9 @@ import { RuleType } from "./RuleType";
 import Threatment from "./Threatment";
 import * as vscode from 'vscode';
 import { ChainingType } from "./ChainingType";
+import sequelize from "../db";
+import { Op, Sequelize } from "sequelize";
 
-export const chainingTypes = {
-    doctype: new ChainingType("doctype", "non-space characters found without seeing a doctype first", "$x"),
-    attribute: new ChainingType("attribute", "is missing required attribute", "x$[y]"),
-    attributeOptional: new ChainingType("attributeOptional", "attribute, except under certain conditions", "x$[y]"),
-    attributeShould: new ChainingType("attributeShould", "consider adding a", "x$[y]"),
-    attributeEmpty: new ChainingType("attributeEmpty", "bad value “” for attribute", "x$[y]"),
-    children: new ChainingType("children", "is missing a required instance of child element", "x$>y"),
-    childrenNotAllowed: new ChainingType("childrenNotAllowed", "not allowed as child of element", "y>x"),
-    childrenNotAppear: new ChainingType("childrenNotAppear", "must not appear as a descendant of the", "y>x"),
-    headingEmpty: new ChainingType("headingEmpty", "empty heading", "x?"),
-    unclosed: new ChainingType("unclosed", "unclosed element", "$/>"),
-    expected: new ChainingType("expected", "expected", "$x"),
-};
 
 export const ruleTypes = {
     error: new RuleType('Erro', vscode.DiagnosticSeverity.Error),
@@ -68,13 +57,20 @@ export class Validator {
         }
     }
 
-    classifyMessage (message: string): ChainingType {      
-        let result = null;
-        Object.entries(chainingTypes).forEach(([keyWord, value]) => {
-            if (message.includes(value.getMessageCode())) {
-                result = value;
+    async classifyMessage (message: string): Promise<ChainingType | null> { 
+        await ChainingType.sync(); 
+        
+        let result = await ChainingType.findOne(
+            {
+                where: Sequelize.where(
+                    Sequelize.literal(`'${message}'`),
+                    Op.like,
+                    Sequelize.col('%messageCode%')
+                )
             }
-        });
-        return result !== null ? result : chainingTypes.expected;
+        );
+        debugger
+
+        return result;
     }
 }

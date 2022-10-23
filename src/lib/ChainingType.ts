@@ -1,17 +1,11 @@
 import {Sequelize, Model, DataTypes} from 'sequelize';
-import db from '../db';
+import sequelize from '../db';
 
-export class ChainingType extends Model{
-    private chain: string;
-    private messageCode: string;
-    private invalidation: string;
-
-    constructor (chain: string, messageCode: string, invalidation: string) {
-        super();
-        this.chain = chain;
-        this.messageCode = messageCode;
-        this.invalidation = invalidation;
-    }
+export class ChainingType extends Model {
+    declare id: Number;
+    declare chain: string;
+    declare messageCode: string;
+    declare invalidation: string;
 
     getMessageCode(): string {
         return this.messageCode;
@@ -27,7 +21,70 @@ export class ChainingType extends Model{
 }
 
 ChainingType.init({
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        unique: true
+    },
     chain: DataTypes.TEXT,
     messageCode: DataTypes.TEXT,
     invalidation: DataTypes.TEXT
-}, {db, modelName: 'chaining_type'});
+}, {sequelize});
+
+(async () => {
+    await sequelize.sync(); 
+    await ChainingType.bulkCreate ([
+        {
+            chain: "unclosed",
+            messageCode: "unclosed element",
+            invalidation: "$/>"
+        },
+        {
+            chain: "headingEmpty",
+            messageCode: "empty heading",
+            invalidation: "x?"
+        },
+        {
+            chain: "childrenNotAppear",
+            messageCode: "must not appear as a descendant of the",
+            invalidation: "y>x"
+        },
+        {
+            chain: "childrenNotAllowed",
+            messageCode: "not allowed as child of element",
+            invalidation: "y>x"
+        },
+        {
+            chain: "children",
+            messageCode: "is missing a required instance of child element",
+            invalidation: "$/>"
+        },
+        {
+            chain: "attributeEmpty",
+            messageCode: "bad value “” for attribute",
+            invalidation: "x$[y]"
+        },
+        {
+            chain: "attributeShould",
+            messageCode: "consider adding a",
+            invalidation: "x$[y]"
+        },
+        {
+            chain: "attributeOptional",
+            messageCode: "attribute, except under certain conditions",
+            invalidation: "x$[y]"
+        },
+        {
+            chain: "attribute",
+            messageCode: "is missing required attribute",
+            invalidation: "x$[y]"
+        },
+        {
+            chain: "doctype",
+            messageCode: "non-space characters found without seeing a doctype first",
+            invalidation: "$x"
+        },
+    ]);
+  })();
+
