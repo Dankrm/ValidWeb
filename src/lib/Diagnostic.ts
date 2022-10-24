@@ -89,7 +89,7 @@ export class Diagnostic {
 		
 		if (vscode.window.activeTextEditor) {
 			this.clearDiagnostics(htmlDiagnostics);
-			Validator.getInstance().requestDataToThreatment(vscode.window.activeTextEditor.document.getText()).then(response => {
+			Validator.getInstance().requestDataToThreatment(vscode.window.activeTextEditor.document.getText()).then( response => {
 				vscode.window.activeTextEditor && this.refreshDiagnostics(vscode.window.activeTextEditor.document, htmlDiagnostics, Validator.getInstance().getRuleSet());
 			});
 		}

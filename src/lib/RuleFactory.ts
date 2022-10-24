@@ -20,15 +20,16 @@ export default class RuleFactory {
 
     constructor () {}
 
-    factory (json : any): Set<Rule> {
-        let rules = new Set<Rule>;
-        json.data.messages.forEach((outerMessage: any) => {
-            this.buildRule(outerMessage).then((response) => {
-                if (response) {
-                    rules.add(response);
+    async factory (json : any): Promise<Set<Rule>> {
+        const rules = new Set<Rule>;
+        for (const outerMessage of json.data.messages) {
+            await this.buildRule(outerMessage).then(rule => {
+                if (rule) {
+                    rules.add(rule);
                 }
             });
-        });
+        }
+        debugger
         return rules;
     }
 
@@ -36,20 +37,23 @@ export default class RuleFactory {
         try {
             const message = outerMessage.message;
             if (message) {
-                const chainingType = await Validator.getInstance().classifyMessage(String(message).toLocaleLowerCase());
-                if (chainingType !== null) {
-                    const connectionRule = new ConnectionRule(chainingType);
+                const messageClassify = Validator.getInstance().classifyMessage(String(message).toLocaleLowerCase());
+                
+                return await messageClassify.then(classification => {
+                    if (classification !== null) {
+                        const connectionRule = new ConnectionRule(classification);
 
-                    const [elementToValidate, validation] = this.searchForElements(message.toLowerCase());
+                        const [elementToValidate, validation] = this.searchForElements(message.toLowerCase());
 
-                    if (connectionRule !== null) {
-                        const rule = new ConcreteRule(connectionRule, message, Validator.getInstance().classifyRuleType(outerMessage));
-                        rule.setBasedElement(elementToValidate);
-                        rule.setValidationElement(validation);
+                        if (connectionRule !== null) {
+                            const rule = new ConcreteRule(connectionRule, message, Validator.getInstance().classifyRuleType(outerMessage));
+                            rule.setBasedElement(elementToValidate);
+                            rule.setValidationElement(validation);
 
-                        return rule;
+                            return rule;
+                        }
                     }
-                }
+                });
             }
         } catch (error) {
             console.error(error);

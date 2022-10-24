@@ -25,7 +25,7 @@ export default class Threatment {
             });
     }
 
-    threatData (json: any): Set<Rule> {
+    async threatData (json: any): Promise<Set<Rule>> {
         return (new RuleFactory()).factory(json);
     }
 }

@@ -3,14 +3,12 @@ import { RuleType } from "./RuleType";
 import Threatment from "./Threatment";
 import * as vscode from 'vscode';
 import { ChainingType } from "./ChainingType";
-import sequelize from "../db";
 import { Op, Sequelize } from "sequelize";
 
 
 export const ruleTypes = {
     error: new RuleType('Erro', vscode.DiagnosticSeverity.Error),
     info: new RuleType('Informação', vscode.DiagnosticSeverity.Information),
-    warning: new RuleType('Alerta', vscode.DiagnosticSeverity.Warning)
 };
 
 export class Validator {
@@ -34,9 +32,11 @@ export class Validator {
     async requestDataToThreatment (html: string) {
         this.allRules = new Set<Rule>;
         try {
-            await this.threatment.callApi(html).then((response)=>{
-                const threatedData = this.threatment.threatData(response);
-                threatedData.forEach(this.allRules.add, this.allRules);
+            await this.threatment.callApi(html).then(async (data) => {
+                const threatedData = await this.threatment.threatData(data);
+                for (const rule of threatedData) {
+                    this.allRules.add(rule);
+                }
             });
         } catch (error) {
             console.error(error);
@@ -48,11 +48,8 @@ export class Validator {
             case 'error': {
                 return ruleTypes.error;
             }
-            case 'info': {
-                return ruleTypes.info;
-            }
             default: {
-                return ruleTypes.warning;
+                return ruleTypes.info;
             }
         }
     }
@@ -62,14 +59,9 @@ export class Validator {
         
         let result = await ChainingType.findOne(
             {
-                where: Sequelize.where(
-                    Sequelize.literal(`'${message}'`),
-                    Op.like,
-                    Sequelize.col('%messageCode%')
-                )
+                where: Sequelize.fn('instr', `'${message}'`, Sequelize.col('messageCode')),
             }
         );
-        debugger
 
         return result;
     }
