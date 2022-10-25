@@ -32,7 +32,7 @@ export class Diagnostic {
 				if (selector[0]) {
 					const foundElements = document.querySelectorAll(selector[0]);
 					if (selector[1]) {
-						foundElements.forEach((found: HTMLElement) => {
+						foundElements.forEach((found: Element) => {
 							const foundElement = jsdom.nodeLocation(found);
 							if (foundElement) {
 								if (selector[1].includes('>')) {

@@ -33,6 +33,9 @@ ChainingType.init({
 }, {sequelize});
 
 (async () => {
+    await ChainingType.destroy({
+        where: {}
+    });
     await sequelize.sync(); 
     await ChainingType.bulkCreate ([
         {
@@ -58,7 +61,7 @@ ChainingType.init({
         {
             chain: "children",
             messageCode: "is missing a required instance of child element",
-            invalidation: "$/>"
+            invalidation: "x$>y"
         },
         {
             chain: "attributeEmpty",
@@ -83,6 +86,11 @@ ChainingType.init({
         {
             chain: "doctype",
             messageCode: "non-space characters found without seeing a doctype first",
+            invalidation: "$x"
+        },
+        {
+            chain: "except",
+            messageCode: "except",
             invalidation: "$x"
         },
     ]);

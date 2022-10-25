@@ -5,12 +5,6 @@ import * as vscode from 'vscode';
 import { ChainingType } from "./ChainingType";
 import { Op, Sequelize } from "sequelize";
 
-
-export const ruleTypes = {
-    error: new RuleType('Erro', vscode.DiagnosticSeverity.Error),
-    info: new RuleType('Informação', vscode.DiagnosticSeverity.Information),
-};
-
 export class Validator {
     private static instance: Validator;
     private threatment: Threatment = Threatment.getInstance();
@@ -43,15 +37,12 @@ export class Validator {
         }
     }
 
-    classifyRuleType (outerMessage: any): RuleType {      
-        switch (outerMessage.type) {
-            case 'error': {
-                return ruleTypes.error;
+    async classifyRuleType (outerMessage: any): Promise<RuleType | null> {      
+        return await RuleType.findOne({
+            where: {
+                code: outerMessage
             }
-            default: {
-                return ruleTypes.info;
-            }
-        }
+        });
     }
 
     async classifyMessage (message: string): Promise<ChainingType | null> { 
