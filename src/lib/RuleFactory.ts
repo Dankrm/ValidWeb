@@ -1,9 +1,7 @@
-import { ChainingType } from "./ChainingType";
 import ConcreteRule from "./ConcreteRule";
 import ConnectionRule from "./ConnectionRule";
 import Rule from "./Rule";
-import { RuleType } from "./RuleType";
-import { Validator } from "./Validator";
+import Threatment from "./Threatment";
 const translate = require('translate-google');
 
 type IValidatorMessage = {
@@ -38,8 +36,8 @@ export default class RuleFactory {
             const message = outerMessage.message;
             if (message) {
                 const messageTranslated = await translate(message, {from: 'en', to: 'pt'});
-                const messageClassify = await Validator.getInstance().classifyMessage(String(message).toLocaleLowerCase());
-                const ruleTypeClassify = await Validator.getInstance().classifyRuleType(outerMessage.type);
+                const messageClassify = await Threatment.getInstance().classifyMessage(String(message).toLocaleLowerCase());
+                const ruleTypeClassify = await Threatment.getInstance().classifyRuleType(outerMessage.type);
                 if (messageClassify !== null && ruleTypeClassify !== null) {
                     const connectionRule = new ConnectionRule(messageClassify);
                     const [elementToValidate, validation] = this.searchForElements(message.toLowerCase());                        

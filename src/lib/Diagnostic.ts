@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import Rule from './Rule';
+import Threatment from './Threatment';
 import { Validator } from './Validator';
+import { ValidatorFactory } from './ValidatorFactory';
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 
@@ -25,49 +27,36 @@ export class Diagnostic {
 	private refreshDiagnostics(doc: vscode.TextDocument, htmlDiagnostics: vscode.DiagnosticCollection, ruleSet: Set<Rule>): void {
 		const jsdom = new JSDOM(doc.getText(), { includeNodeLocations: true });
 		const document = jsdom.window.document;
-	
 		ruleSet.forEach(rule => {
 			try {
 				const selector = rule.constructQuerySelector();
 				if (selector[0]) {
 					const foundElements = document.querySelectorAll(selector[0]);
 					if (selector[1]) {
+						if (foundElements) {
+							foundElements.forEach((foundElement: Element) => {
+								const foundElementLocation = jsdom.nodeLocation(foundElement);
+								if (foundElementLocation) {
+									const promise = this.getValidatorByRule(foundElement, rule);
+									if (promise?.execute()) {
+										this.diagnostics.push(this.createDiagnostic(foundElementLocation.startLine - 1, foundElementLocation.startCol, rule));
+									}
+									
+								} else {
+									this.showInformationMessage(rule.description);
+								}
+							});
+						} else {
+							this.showInformationMessage(rule.description);
+						}
+					} else {
 						foundElements.forEach((found: Element) => {
 							const foundElement = jsdom.nodeLocation(found);
-							if (foundElement) {
-								if (selector[1].includes('>')) {
-									selector[1] = selector[1].replace('>', '');
-									let childrenfound = false;
-									found.childNodes.forEach( children => {
-										if (children.nodeName === selector[1]) {
-											childrenfound = true;
-										}
-									});
-									!childrenfound ? this.diagnostics.push(this.createDiagnostic(foundElement.startLine - 1, foundElement.startCol, rule)) : "";
-								} else if (selector[1].includes('[')) {
-									selector[1] = selector[1].replaceAll('[', '').replaceAll(']', '');
-									let attributefound = false;
-									found.getAttributeNames().forEach(attribute => {
-										if (attribute === selector[1]) {
-											attributefound = true;
-										}
-									});
-									!attributefound ? this.diagnostics.push(this.createDiagnostic(foundElement.startLine - 1, foundElement.startCol, rule)) : "";
-								}
-							} else {
-								//sugestão para criar
-							}
-						});
-
-					} else {
-						foundElements.forEach((found: HTMLElement) => {
-							const foundElement = jsdom.nodeLocation(found);
-
 							this.diagnostics.push(this.createDiagnostic(foundElement.startLine - 1, foundElement.startCol, rule));
 						});
 					} 
 				} else {
-					//fazer opeerações de sugestão ou mesnsagem
+					this.showInformationMessage(rule.description);
 				}
 			} catch (error) {
 				console.log(error);
@@ -84,13 +73,16 @@ export class Diagnostic {
 		return diagnostic;
 	}
 
+	private showInformationMessage(message: string): void {
+		vscode.window.showInformationMessage(message);
+	}
 
 	subscribeToDocumentChanges(context: vscode.ExtensionContext, htmlDiagnostics: vscode.DiagnosticCollection): void {
 		
 		if (vscode.window.activeTextEditor) {
 			this.clearDiagnostics(htmlDiagnostics);
-			Validator.getInstance().requestDataToThreatment(vscode.window.activeTextEditor.document.getText()).then( response => {
-				vscode.window.activeTextEditor && this.refreshDiagnostics(vscode.window.activeTextEditor.document, htmlDiagnostics, Validator.getInstance().getRuleSet());
+			Threatment.getInstance().requestDataToThreatment(vscode.window.activeTextEditor.document.getText()).then(response => {
+				vscode.window.activeTextEditor && this.refreshDiagnostics(vscode.window.activeTextEditor.document, htmlDiagnostics, Threatment.getInstance().getRuleSet());
 			});
 		}
 
@@ -107,8 +99,8 @@ export class Diagnostic {
 		context.subscriptions.push(
 			vscode.workspace.onDidSaveTextDocument(editor => {
 				this.clearDiagnostics(htmlDiagnostics);
-				Validator.getInstance().requestDataToThreatment(editor.getText()).then(response => {
-					this.refreshDiagnostics(editor, htmlDiagnostics, Validator.getInstance().getRuleSet());
+				Threatment.getInstance().requestDataToThreatment(editor.getText()).then(response => {
+					this.refreshDiagnostics(editor, htmlDiagnostics, Threatment.getInstance().getRuleSet());
 				});
 			})
 		);
@@ -117,4 +109,9 @@ export class Diagnostic {
 			vscode.workspace.onDidCloseTextDocument(doc => htmlDiagnostics.delete(doc.uri))
 		);
 	}
+
+	getValidatorByRule (found: Element, rule: Rule): Validator | null {
+		return ValidatorFactory.methodFactory(found, rule);
+	}
+
 }

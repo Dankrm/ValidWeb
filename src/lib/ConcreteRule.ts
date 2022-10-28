@@ -71,12 +71,11 @@ export default class ConcreteRule implements Rule {
 
         if (this.connectionRule.getChainingType().getInvalidation() !== '') {
             query = this.connectionRule.getChainingType().getInvalidation();
-
             if (this.connectionRule.getBasedElement() !== ''){
                 query = query.replaceAll('x', this.connectionRule.getBasedElement());
             }
 
-            if (this.connectionRule.getValidationElement() !== ''){
+            if (this.getValidationElement() !== ''){
                 query = query.replaceAll('y', this.getValidationElement());
             }
 
