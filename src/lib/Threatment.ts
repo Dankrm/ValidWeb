@@ -4,7 +4,6 @@ import RuleFactory from "./RuleFactory";
 import { RuleType } from "./RuleType";
 import { ChainingType } from "./ChainingType";
 import { Op, Sequelize } from "sequelize";
-const parseString = require("xml2js").parseString;
 
 export default class Threatment {
     private static instance: Threatment;

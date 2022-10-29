@@ -22,6 +22,7 @@ RuleType.init({
     code: DataTypes.TEXT,
     type: DataTypes.TEXT,
     diagnostic: DataTypes.NUMBER,
+    visible: DataTypes.BOOLEAN,
 }, {sequelize});
 
 (async () => {
@@ -33,12 +34,14 @@ RuleType.init({
         {
             code: "error",
             type: "Erro",
-            diagnostic: vscode.DiagnosticSeverity.Error
+            diagnostic: vscode.DiagnosticSeverity.Error,
+            visible: true
         },
         {
             code: "info",
             type: "Informação",
-            diagnostic: vscode.DiagnosticSeverity.Information
+            diagnostic: vscode.DiagnosticSeverity.Information,
+            visible: true
         },
     ]);
 })();

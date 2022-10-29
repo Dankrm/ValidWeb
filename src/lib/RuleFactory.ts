@@ -1,5 +1,4 @@
-import ConcreteRule from "./ConcreteRule";
-import ConnectionRule from "./ConnectionRule";
+import ConcreteRule from "./Rule";
 import Rule from "./Rule";
 import Threatment from "./Threatment";
 const translate = require('translate-google');
@@ -39,14 +38,11 @@ export default class RuleFactory {
                 const messageClassify = await Threatment.getInstance().classifyMessage(String(message).toLocaleLowerCase());
                 const ruleTypeClassify = await Threatment.getInstance().classifyRuleType(outerMessage.type);
                 if (messageClassify !== null && ruleTypeClassify !== null) {
-                    const connectionRule = new ConnectionRule(messageClassify);
                     const [elementToValidate, validation] = this.searchForElements(message.toLowerCase());                        
-                    if (connectionRule !== null) {
-                        const rule = new ConcreteRule(connectionRule, messageTranslated, ruleTypeClassify);
-                        rule.setBasedElement(elementToValidate);
-                        rule.setValidationElement(validation);
-                        return rule;
-                    }
+                    const rule = new ConcreteRule(messageClassify, messageTranslated, ruleTypeClassify);
+                    rule.setBasedElement(elementToValidate);
+                    rule.setValidationElement(validation);
+                    return rule;
                 }
             }
         } catch (error) {

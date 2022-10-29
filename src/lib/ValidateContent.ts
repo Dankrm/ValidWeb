@@ -10,13 +10,7 @@ export class ValidateContent extends Validator {
     }
 
     protected customValidate(): boolean {
-		let attributefound = false;
-		for (const attribute of this.found.getAttributeNames()) {
-			if (attribute === this.invalidation) {
-				attributefound = true;
-			}
-		}
-        return attributefound;
+        return this.found.textContent?.trim() !== '';
     }
 
 }

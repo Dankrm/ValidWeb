@@ -44,11 +44,11 @@ export class Diagnostic {
 									}
 									
 								} else {
-									this.showInformationMessage(rule.description);
+									this.showInformationMessage(rule.getDescription());
 								}
 							});
 						} else {
-							this.showInformationMessage(rule.description);
+							this.showInformationMessage(rule.getDescription());
 						}
 					} else {
 						foundElements.forEach((found: Element) => {
@@ -57,7 +57,7 @@ export class Diagnostic {
 						});
 					} 
 				} else {
-					this.showInformationMessage(rule.description);
+					this.showInformationMessage(rule.getDescription());
 				}
 			} catch (error) {
 				console.log(error);
@@ -68,8 +68,8 @@ export class Diagnostic {
 	}
 
 	private createDiagnostic(line: number, column: number, rule: Rule): vscode.Diagnostic {
-		const range = new vscode.Range(line, column, line, column + rule.connectionRule.getBasedElement().length);
-		const diagnostic = new vscode.Diagnostic(range, rule.description, rule.ruleType.getDiagnostic());
+		const range = new vscode.Range(line, column, line, column + rule.getBasedElement().length);
+		const diagnostic = new vscode.Diagnostic(range, rule.getDescription(), rule.getRuleType().getDiagnostic());
 		diagnostic.code = errorMention;
 		return diagnostic;
 	}
