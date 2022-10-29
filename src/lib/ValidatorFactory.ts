@@ -10,12 +10,15 @@ export class ValidatorFactory {
         switch (rule.connectionRule.getChainingType().getSelector()) {
             case '>': {
                 retorno = new ValidateChildren(found, rule);
+                break;
             }
             case '[': {
                 retorno = new ValidateAttributes(found, rule);
+                break;
             }
             case 'content': {
                 retorno = new ValidateContent(found, rule);
+                break;
             }
             default : {
                 retorno = null;

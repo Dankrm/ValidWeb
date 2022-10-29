@@ -37,8 +37,9 @@ export class Diagnostic {
 							foundElements.forEach((foundElement: Element) => {
 								const foundElementLocation = jsdom.nodeLocation(foundElement);
 								if (foundElementLocation) {
-									const promise = this.getValidatorByRule(foundElement, rule);
-									if (promise?.execute()) {
+									const validator = this.getValidatorByRule(foundElement, rule);
+									const validate = validator?.execute();
+									if (!validate) {
 										this.diagnostics.push(this.createDiagnostic(foundElementLocation.startLine - 1, foundElementLocation.startCol, rule));
 									}
 									
