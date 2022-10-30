@@ -5,9 +5,9 @@ import { PrismaClient } from '@prisma/client';
 import { Diagnostic } from './lib/Diagnostic';
 const prisma = new PrismaClient();
 
-export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
+export class SidebarRuleTypesProvider implements vscode.WebviewViewProvider {
 
-	public static readonly viewType = 'validweb-sidebar-webview';
+	public static readonly viewType = 'validweb-sidebar-ruletypes';
 
 	private _view?: vscode.WebviewView;
 
@@ -57,7 +57,9 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
 					Diagnostic.getInstance().clearDiagnostics();
 					vscode.window.activeTextEditor?.document && 
 						Diagnostic.getInstance().refreshDiagnostics(vscode.window.activeTextEditor.document);
+					break;
 				}
+				
 			}
 		  });
 	}
@@ -87,6 +89,9 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
 			</head>
 			<body>
 				<div id="root"></div>
+				<script>
+					let routeInitial = '/ruletypes';
+				</script>
 				<script src="${reactAppPathOnDisk}"></script>
 			</body>
 			</html>`;

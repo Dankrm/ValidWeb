@@ -34,9 +34,15 @@
         },
         {
           "type": "webview",
-          "id": "validweb-sidebar-webview",
+          "id": "validweb-sidebar-ruletypes",
           "name": "Marcadores",
           "contextualTitle": "Marcadores"
+        },
+        {
+          "type": "webview",
+          "id": "validweb-sidebar-rules",
+          "name": "Regras",
+          "contextualTitle": "Regras"
         }
       ]
     }

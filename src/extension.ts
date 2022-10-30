@@ -1,15 +1,20 @@
 import * as vscode from 'vscode';
-import { SidebarWebviewProvider } from './SidebarWebviewProvider';
+import { SidebarRuleTypesProvider } from './SidebarRuleTypesProvider';
+import { SidebarRulesProvider } from './SidebarRulesProvider';
 import { HtmlCodeActionProvider } from './HtmlCodeActionProvider';
 import { Diagnostic } from './lib/Diagnostic';
 
 
 export function activate(context: vscode.ExtensionContext) {
 
-	const provider = new SidebarWebviewProvider(context);
-
+	const provider = new SidebarRuleTypesProvider(context);
 	context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider(SidebarWebviewProvider.viewType, provider)
+		vscode.window.registerWebviewViewProvider(SidebarRuleTypesProvider.viewType, provider)
+	);	
+	
+	const providerRules = new SidebarRulesProvider(context);
+	context.subscriptions.push(
+		vscode.window.registerWebviewViewProvider(SidebarRulesProvider.viewType, providerRules)
 	);
 
 	context.subscriptions.push(

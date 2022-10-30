@@ -1,5 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { ChangeEvent, useState } from 'react';
 import { vscodeAPI } from '../../lib/VSCodeApi';
 
 type RuleType = {
@@ -16,8 +15,14 @@ vscodeAPI.postMessage(
   }
 );
 
-export default function Main() {
+export default function RuleTypes () {
   const [ruleTypes, setRuleTypes] = useState<RuleType[]>([]);
+
+  vscodeAPI.postMessage(
+    {
+      type: 'loadRuleTypes',
+    }
+  );  
 
   vscodeAPI.onMessage((message) => {
     switch (message.data.type) {
@@ -44,9 +49,6 @@ export default function Main() {
 
   return (
     <>
-      <div className="btn-controls">
-        
-      </div>
       { ruleTypes && ruleTypes.map((ruleType, index) => {
         return (
           <div>
