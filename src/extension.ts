@@ -18,10 +18,8 @@ export function activate(context: vscode.ExtensionContext) {
 		})
 	);
 
-	const htmlDiagnostics = vscode.languages.createDiagnosticCollection("validweb");
-	context.subscriptions.push(htmlDiagnostics);
-	Diagnostic.getInstance().subscribeToDocumentChanges(context, htmlDiagnostics);
-
+	context.subscriptions.push(Diagnostic.htmlDiagnostics);
+	Diagnostic.getInstance().subscribeToDocumentChanges(context);
 }
 
 export function deactivate() {}

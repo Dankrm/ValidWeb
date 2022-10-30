@@ -37,7 +37,7 @@ export default class Threatment {
     }
 
     async threatData (json: any): Promise<void> {
-        (new RuleFactory()).factory(json);
+        await (new RuleFactory()).factory(json);
     }
 
     async classifyRuleType (outerMessage: any): Promise<RuleType | null> {

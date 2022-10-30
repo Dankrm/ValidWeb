@@ -1,6 +1,10 @@
 
 import * as vscode from 'vscode';
 
+import { PrismaClient } from '@prisma/client';
+import { Diagnostic } from './lib/Diagnostic';
+const prisma = new PrismaClient();
+
 export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
 
 	public static readonly viewType = 'validweb-sidebar-webview';
@@ -31,11 +35,29 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
 
 		webviewView.webview.onDidReceiveMessage(async (data) => {
 			switch (data.type) {
-			  case "validateApi": {
+				case "loadRuleTypes": {
+					const ruleTypes = await prisma.ruleType.findMany();
+					webviewView.webview.postMessage(
+						{
+							type: "loadedRuleTypes",
+							ruleTypes: ruleTypes
+						});
 
-
-				break;
-			  }
+					break;
+				}
+				case "changeVisibilityRuleTypes": {
+					await prisma.ruleType.update({
+						where: {
+							id: Number(data.id)
+						},
+						data: {
+							visible: data.visible
+						}
+					});
+					Diagnostic.getInstance().clearDiagnostics();
+					vscode.window.activeTextEditor?.document && 
+						Diagnostic.getInstance().refreshDiagnostics(vscode.window.activeTextEditor.document);
+				}
 			}
 		  });
 	}

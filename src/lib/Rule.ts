@@ -1,4 +1,4 @@
-import { PrismaClient, Rule as DbRule, ChainingType as DbChainingType, RuleType, ChainingType} from "@prisma/client";
+import { Rule as DbRule, RuleType, ChainingType} from "@prisma/client";
 
 export default class Rule {
     constructor(

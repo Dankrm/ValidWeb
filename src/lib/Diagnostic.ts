@@ -14,6 +14,8 @@ export const errorMention = "html_error";
 export class Diagnostic {
 	private static instance: Diagnostic;
 	private diagnostics: vscode.Diagnostic[] = [];
+	public static htmlDiagnostics = vscode.languages.createDiagnosticCollection("validweb");
+
 	
 	public static getInstance(): Diagnostic {
         if (!Diagnostic.instance) {
@@ -22,12 +24,12 @@ export class Diagnostic {
         return Diagnostic.instance;
     }
 
-	private clearDiagnostics(htmlDiagnostics: vscode.DiagnosticCollection) {
+	public clearDiagnostics() {
 		this.diagnostics = [];
-		htmlDiagnostics.clear();
+		Diagnostic.htmlDiagnostics.clear();
 	}
 
-	private async refreshDiagnostics(doc: vscode.TextDocument, htmlDiagnostics: vscode.DiagnosticCollection): Promise<void> {
+	public async refreshDiagnostics(doc: vscode.TextDocument): Promise<void> {
 		const jsdom = new JSDOM(doc.getText(), { includeNodeLocations: true });
 		const document = jsdom.window.document;
 
@@ -35,10 +37,16 @@ export class Diagnostic {
 			include: {
 				ruleType: true,
 				chainingType: true
+			},
+			where: {
+				visible: true,
+				ruleType: {
+					visible: true
+				}
 			}
 		});
 
-		rules.forEach(rule => {
+		for (const rule of rules) {
 			try {
 				const ruleModel = new Rule(rule);
 				const selector = ruleModel.constructQuerySelector();
@@ -46,7 +54,7 @@ export class Diagnostic {
 					const foundElements = document.querySelectorAll(selector[0]);
 					if (selector[1]) {
 						if (foundElements) {
-							foundElements.forEach((foundElement: Element) => {
+							for (const foundElement of foundElements) {
 								const foundElementLocation = jsdom.nodeLocation(foundElement);
 								if (foundElementLocation) {
 									const validator = this.getValidatorByRule(foundElement, ruleModel);
@@ -54,19 +62,18 @@ export class Diagnostic {
 									if (!validate) {
 										this.diagnostics.push(this.createDiagnostic(foundElementLocation.startLine - 1, foundElementLocation.startCol, ruleModel));
 									}
-									
 								} else {
 									this.showInformationMessage(ruleModel.getRule().description);
 								}
-							});
+							}
 						} else {
 							this.showInformationMessage(ruleModel.getRule().description);
 						}
 					} else {
-						foundElements.forEach((found: Element) => {
+						for (const found of foundElements) {
 							const foundElement = jsdom.nodeLocation(found);
 							this.diagnostics.push(this.createDiagnostic(foundElement.startLine - 1, foundElement.startCol, ruleModel));
-						});
+						}
 					} 
 				} else {
 					this.showInformationMessage(ruleModel.getRule().description);
@@ -74,9 +81,8 @@ export class Diagnostic {
 			} catch (error) {
 				console.log(error);
 			}
-		});
-
-		htmlDiagnostics.set(doc.uri, this.diagnostics);
+		}
+		Diagnostic.htmlDiagnostics.set(doc.uri, this.diagnostics);
 	}
 
 	private createDiagnostic(line: number, column: number, rule: Rule): vscode.Diagnostic {
@@ -90,36 +96,42 @@ export class Diagnostic {
 		vscode.window.showInformationMessage(message);
 	}
 
-	subscribeToDocumentChanges(context: vscode.ExtensionContext, htmlDiagnostics: vscode.DiagnosticCollection): void {
-		
+	public subscribeToDocumentChanges(context: vscode.ExtensionContext): void {
 		if (vscode.window.activeTextEditor) {
-			this.clearDiagnostics(htmlDiagnostics);
-			Threatment.getInstance().requestDataToThreatment(vscode.window.activeTextEditor.document.getText()).then(response => {
-				vscode.window.activeTextEditor && this.refreshDiagnostics(vscode.window.activeTextEditor.document, htmlDiagnostics);
+			this.clearDiagnostics();
+			Threatment.getInstance().requestDataToThreatment(vscode.window.activeTextEditor.document.getText()).then(async response => {
+				vscode.window.activeTextEditor && await this.refreshDiagnostics(vscode.window.activeTextEditor.document);
 			});
 		}
 
-		// context.subscriptions.push(
-		// 	vscode.window.onDidChangeActiveTextEditor(editor => {
-		// 		if (editor) {
-		// 			Validator.getInstance().requestDataToThreatment(editor.document.getText()).then(response => {
-		// 				this.refreshDiagnostics(editor.document, htmlDiagnostics, Validator.getInstance().getRuleSet());
-		// 			});
-		// 		}
-		// 	})
-		// );
+		context.subscriptions.push(
+			vscode.workspace.onDidChangeTextDocument(editor => {
+				if (editor) {
+					this.clearDiagnostics();
+					this.refreshDiagnostics(editor.document);
+				}
+			})
+		);
+
+		context.subscriptions.push(
+			vscode.window.onDidChangeActiveTextEditor(editor => {
+				if (editor) {
+					this.refreshDiagnostics(editor.document);
+				}
+			})
+		);
 
 		context.subscriptions.push(
 			vscode.workspace.onDidSaveTextDocument(editor => {
-				this.clearDiagnostics(htmlDiagnostics);
+				this.clearDiagnostics();
 				Threatment.getInstance().requestDataToThreatment(editor.getText()).then(response => {
-					this.refreshDiagnostics(editor, htmlDiagnostics);
+					this.refreshDiagnostics(editor);
 				});
 			})
 		);
 
 		context.subscriptions.push(
-			vscode.workspace.onDidCloseTextDocument(doc => htmlDiagnostics.delete(doc.uri))
+			vscode.workspace.onDidCloseTextDocument(doc => Diagnostic.htmlDiagnostics.delete(doc.uri))
 		);
 	}
 

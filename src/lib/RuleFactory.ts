@@ -59,13 +59,13 @@ export default class RuleFactory {
         let searchWords = ['element', 'attribute', 'expected'];
         let searchSlashes = ['“', '”'];
 
-        searchWords.forEach( word => {      
-            while ((found = message.indexOf(word, found)) !== -1 && foundCount < 2) {
-                if (message.charAt(found + word.length + 1) === searchSlashes[0]) {
+        for (const searchWord of searchWords) { 
+            while ((found = message.indexOf(searchWord, found)) !== -1 && foundCount < 2) {
+                if (message.charAt(found + searchWord.length + 1) === searchSlashes[0]) {
                     if (foundCount === 0) {
-                        elementToValidate = message.substring(found + word.length + 2, message.indexOf(searchSlashes[1], found + word.length + 2)); 
+                        elementToValidate = message.substring(found + searchWord.length + 2, message.indexOf(searchSlashes[1], found + searchWord.length + 2)); 
                     } else {
-                        validation = message.substring(found + word.length + 2, message.indexOf(searchSlashes[1], found + word.length + 2)); 
+                        validation = message.substring(found + searchWord.length + 2, message.indexOf(searchSlashes[1], found + searchWord.length + 2)); 
                     }
                 } else if (message.charAt(found - 2) === searchSlashes[1]) {
                     if (foundCount === 0) {
@@ -77,7 +77,7 @@ export default class RuleFactory {
                 found++;
                 foundCount++;
             }
-        });
+        }
 
         return [elementToValidate, validation];
     }
