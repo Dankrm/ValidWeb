@@ -1,47 +1,6 @@
+import { PrismaClient } from '@prisma/client';
 
-import { DataTypes, Model } from 'sequelize';
-import * as vscode from 'vscode';
-import sequelize from '../db';
-
-export class RuleType extends Model {
-    declare type: string | undefined;
-    declare diagnostic: vscode.DiagnosticSeverity;
-
-    public getDiagnostic(){
-        return this.diagnostic;
-    }
+export class RuleType {
+    constructor(private readonly ruleType: PrismaClient['ruleType']) {}
 }
 
-RuleType.init({
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-        unique: true
-    },
-    code: DataTypes.TEXT,
-    type: DataTypes.TEXT,
-    diagnostic: DataTypes.NUMBER,
-    visible: DataTypes.BOOLEAN,
-}, {sequelize});
-
-(async () => {
-    await RuleType.destroy({
-        where: {}
-    });
-    await sequelize.sync(); 
-    await RuleType.bulkCreate ([
-        {
-            code: "error",
-            type: "Erro",
-            diagnostic: vscode.DiagnosticSeverity.Error,
-            visible: true
-        },
-        {
-            code: "info",
-            type: "Informação",
-            diagnostic: vscode.DiagnosticSeverity.Information,
-            visible: true
-        },
-    ]);
-})();

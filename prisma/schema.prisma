@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./validweb.sqlite"
+}
+
+model ChainingType {
+  id            Int     @id @default(autoincrement())
+  chain         String 
+  selector      String 
+  messageCode   String 
+  invalidation  String 
+
+  rules Rule[]
+}
+
+model RuleType {
+  id            Int     @id @default(autoincrement()) 
+  code          String
+  type          String
+  diagnostic    Int
+  visible       Boolean @default(true)
+
+  rules Rule[]
+}
+
+model Rule {
+  id                Int     @id @default(autoincrement()) 
+  ruleTypeId        Int
+  chainingTypeId    Int
+
+  description       String
+  basedElement      String
+  validationElement String
+  visible           Boolean @default(true)
+
+  ruleType          RuleType @relation(fields: [ruleTypeId], references: [id])
+  chainingType      ChainingType @relation(fields: [chainingTypeId], references: [id])
+
+  @@unique([chainingTypeId, basedElement, validationElement])
+}
+
+
+

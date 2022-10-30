@@ -1,3 +1,4 @@
+import { PrismaClient } from '@prisma/client';
 import * as vscode from 'vscode';
 import Rule from './Rule';
 import Threatment from './Threatment';
@@ -5,6 +6,8 @@ import { Validator } from './Validator';
 import { ValidatorFactory } from './ValidatorFactory';
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
+
+const prisma = new PrismaClient();
 
 export const errorMention = "html_error";
 
@@ -24,12 +27,21 @@ export class Diagnostic {
 		htmlDiagnostics.clear();
 	}
 
-	private refreshDiagnostics(doc: vscode.TextDocument, htmlDiagnostics: vscode.DiagnosticCollection, ruleSet: Set<Rule>): void {
+	private async refreshDiagnostics(doc: vscode.TextDocument, htmlDiagnostics: vscode.DiagnosticCollection): Promise<void> {
 		const jsdom = new JSDOM(doc.getText(), { includeNodeLocations: true });
 		const document = jsdom.window.document;
-		ruleSet.forEach(rule => {
+
+		const rules = await prisma.rule.findMany({
+			include: {
+				ruleType: true,
+				chainingType: true
+			}
+		});
+
+		rules.forEach(rule => {
 			try {
-				const selector = rule.constructQuerySelector();
+				const ruleModel = new Rule(rule);
+				const selector = ruleModel.constructQuerySelector();
 				if (selector[0]) {
 					const foundElements = document.querySelectorAll(selector[0]);
 					if (selector[1]) {
@@ -37,27 +49,27 @@ export class Diagnostic {
 							foundElements.forEach((foundElement: Element) => {
 								const foundElementLocation = jsdom.nodeLocation(foundElement);
 								if (foundElementLocation) {
-									const validator = this.getValidatorByRule(foundElement, rule);
+									const validator = this.getValidatorByRule(foundElement, ruleModel);
 									const validate = validator?.execute();
 									if (!validate) {
-										this.diagnostics.push(this.createDiagnostic(foundElementLocation.startLine - 1, foundElementLocation.startCol, rule));
+										this.diagnostics.push(this.createDiagnostic(foundElementLocation.startLine - 1, foundElementLocation.startCol, ruleModel));
 									}
 									
 								} else {
-									this.showInformationMessage(rule.getDescription());
+									this.showInformationMessage(ruleModel.getRule().description);
 								}
 							});
 						} else {
-							this.showInformationMessage(rule.getDescription());
+							this.showInformationMessage(ruleModel.getRule().description);
 						}
 					} else {
 						foundElements.forEach((found: Element) => {
 							const foundElement = jsdom.nodeLocation(found);
-							this.diagnostics.push(this.createDiagnostic(foundElement.startLine - 1, foundElement.startCol, rule));
+							this.diagnostics.push(this.createDiagnostic(foundElement.startLine - 1, foundElement.startCol, ruleModel));
 						});
 					} 
 				} else {
-					this.showInformationMessage(rule.getDescription());
+					this.showInformationMessage(ruleModel.getRule().description);
 				}
 			} catch (error) {
 				console.log(error);
@@ -68,8 +80,8 @@ export class Diagnostic {
 	}
 
 	private createDiagnostic(line: number, column: number, rule: Rule): vscode.Diagnostic {
-		const range = new vscode.Range(line, column, line, column + rule.getBasedElement().length);
-		const diagnostic = new vscode.Diagnostic(range, rule.getDescription(), rule.getRuleType().getDiagnostic());
+		const range = new vscode.Range(line, column, line, column + rule.getRule().basedElement.length);
+		const diagnostic = new vscode.Diagnostic(range, rule.getRule().description, rule.getRule().ruleType.diagnostic);
 		diagnostic.code = errorMention;
 		return diagnostic;
 	}
@@ -83,7 +95,7 @@ export class Diagnostic {
 		if (vscode.window.activeTextEditor) {
 			this.clearDiagnostics(htmlDiagnostics);
 			Threatment.getInstance().requestDataToThreatment(vscode.window.activeTextEditor.document.getText()).then(response => {
-				vscode.window.activeTextEditor && this.refreshDiagnostics(vscode.window.activeTextEditor.document, htmlDiagnostics, Threatment.getInstance().getRuleSet());
+				vscode.window.activeTextEditor && this.refreshDiagnostics(vscode.window.activeTextEditor.document, htmlDiagnostics);
 			});
 		}
 
@@ -101,7 +113,7 @@ export class Diagnostic {
 			vscode.workspace.onDidSaveTextDocument(editor => {
 				this.clearDiagnostics(htmlDiagnostics);
 				Threatment.getInstance().requestDataToThreatment(editor.getText()).then(response => {
-					this.refreshDiagnostics(editor, htmlDiagnostics, Threatment.getInstance().getRuleSet());
+					this.refreshDiagnostics(editor, htmlDiagnostics);
 				});
 			})
 		);

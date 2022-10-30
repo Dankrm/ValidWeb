@@ -7,7 +7,7 @@ import { Validator } from "./Validator";
 export class ValidatorFactory {
     public static methodFactory(found: Element, rule: Rule): Validator | null {
         let retorno;
-        switch (rule.getChainingType().getSelector()) {
+        switch (rule.getRule().chainingType.selector) {
             case '>': {
                 retorno = new ValidateChildren(found, rule);
                 break;

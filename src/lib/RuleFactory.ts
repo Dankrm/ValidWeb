@@ -1,7 +1,9 @@
 import ConcreteRule from "./Rule";
 import Rule from "./Rule";
 import Threatment from "./Threatment";
+import { PrismaClient } from "@prisma/client";
 const translate = require('translate-google');
+const prisma = new PrismaClient();
 
 type IValidatorMessage = {
     extract: string
@@ -18,19 +20,13 @@ export default class RuleFactory {
 
     constructor () {}
 
-    async factory (json : any): Promise<Set<Rule>> {
-        const rules = new Set<Rule>;
+    async factory (json : any): Promise<void> {
         for (const outerMessage of json.data.messages) {
-            await this.buildRule(outerMessage).then(rule => {
-                if (rule) {
-                    rules.add(rule);
-                }
-            });
+            await this.buildRule(outerMessage);
         }
-        return rules;
     }
 
-    async buildRule (outerMessage: IValidatorMessage): Promise<Rule | undefined> {
+    async buildRule (outerMessage: IValidatorMessage): Promise<void> {
         try {
             const message = outerMessage.message;
             if (message) {
@@ -38,11 +34,16 @@ export default class RuleFactory {
                 const messageClassify = await Threatment.getInstance().classifyMessage(String(message).toLocaleLowerCase());
                 const ruleTypeClassify = await Threatment.getInstance().classifyRuleType(outerMessage.type);
                 if (messageClassify !== null && ruleTypeClassify !== null) {
-                    const [elementToValidate, validation] = this.searchForElements(message.toLowerCase());                        
-                    const rule = new ConcreteRule(messageClassify, messageTranslated, ruleTypeClassify);
-                    rule.setBasedElement(elementToValidate);
-                    rule.setValidationElement(validation);
-                    return rule;
+                    const [elementToValidate, validation] = this.searchForElements(message.toLowerCase());         
+                    await prisma.rule.create({
+                        data: {
+                            chainingTypeId: ruleTypeClassify.id,
+                            ruleTypeId: ruleTypeClassify.id,
+                            basedElement: elementToValidate,
+                            description: messageTranslated,
+                            validationElement: validation
+                        },
+                    });
                 }
             }
         } catch (error) {

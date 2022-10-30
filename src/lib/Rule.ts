@@ -1,75 +1,36 @@
-import { ChainingType } from "./ChainingType";
-import { RuleType } from "./RuleType";
+import { PrismaClient, Rule as DbRule, ChainingType as DbChainingType, RuleType, ChainingType} from "@prisma/client";
 
 export default class Rule {
-    private description: string;
-    private ruleType: RuleType;
-    private chainingType : ChainingType;
-    private basedElement : string = '';
-    private validationElement : string = '';
+    constructor(
+        private readonly rule: DbRule & {
+            ruleType: RuleType;
+            chainingType: ChainingType;
+        }
+        ) {}
 
-    constructor (chainingType: ChainingType, description: string, ruleType: RuleType) {
-        this.description = description;
-        this.ruleType = ruleType;
-        this.chainingType = chainingType;
+    getRule() {
+        return this.rule;
     }
-
-    getChainingType (): ChainingType {
-        return this.chainingType;
-    }    
     
-    getRuleType (): RuleType {
-        return this.ruleType;
-    }
-
-    setRuleType (ruleType: RuleType) {
-        this.ruleType = ruleType;
-    }
-
-    getDescription (): string {
-        return this.description;
-    }
-
-    setDescription (description: string) {
-        this.description = description;
-    }
-
-    getBasedElement(): string {
-        return this.basedElement;
-    }
-
-    setBasedElement(basedElement: string) {
-        this.basedElement = basedElement;
-    }
-
-    getValidationElement(): string {
-        return this.validationElement;
-    }
-
-    setValidationElement(validationElement: string) {
-        this.validationElement = validationElement;
-    }
-
     constructQuerySelector (): [string, string] {
         let query = '';
-        let tem = '';
-        let naoTem = '';
-
-        if (this.chainingType.getInvalidation() !== '') {
-            query = this.chainingType.getInvalidation();
-            if (this.getBasedElement() !== ''){
-                query = query.replaceAll('x', this.getBasedElement());
+        let has = '';
+        let dontHas = '';
+        if (this.rule.chainingType.invalidation !== '') {
+            query = this.rule.chainingType.invalidation;
+            if (this.rule.basedElement !== ''){
+                query = query.replaceAll('x', this.rule.basedElement);
             }
 
-            if (this.getValidationElement() !== ''){
-                query = query.replaceAll('y', this.getValidationElement());
+            if (this.rule.validationElement !== ''){
+                query = query.replaceAll('y', this.rule.basedElement);
             }
 
-            [tem, naoTem] = query.split('$');
+            [has, dontHas] = query.split('$');
         } else {
 
         }
 
-        return [tem, naoTem];
+        return [has, dontHas];
     }
 }
