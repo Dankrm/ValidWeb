@@ -72,13 +72,13 @@ const chainingTypes = [
 		chain: "doctype",
 		selector: "doctype",
 		messageCode: "non-space characters found without seeing a doctype first",
-		invalidation: "x$"
+		invalidation: "$?x"
 	},
 	{
 		chain: "doctype",
 		selector: "doctype",
 		messageCode: "end of file seen without seeing a doctype first. expected",
-		invalidation: "$x"
+		invalidation: "$?x"
 	},
 	{
 		chain: "except",
@@ -105,17 +105,21 @@ const ruleTypes = [
 
 const load = async () => {
   try {
-	chainingTypes.forEach(async chainingType => {
-		await prisma.chainingType.create({
-		  data: chainingType
-		});
-	});
-    console.log('Added product data');
+	await prisma.rule.deleteMany();
+	await prisma.ruleType.deleteMany();
 	ruleTypes.forEach(async ruleType =>{
 		await prisma.ruleType.create({
 			data: ruleType
 		});
 	});
+	console.log('Added ruleTypes data');
+	await prisma.chainingType.deleteMany();
+	chainingTypes.forEach(async chainingType => {
+		await prisma.chainingType.create({
+		  data: chainingType
+		});
+	});
+    console.log('Added chainingTypes data');
   } catch (e) {
     console.error(e);
     process.exit(1);

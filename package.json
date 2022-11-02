@@ -90,6 +90,7 @@
     "webpack-cli": "^4.10.0"
   },
   "dependencies": {
+    "@iamtraction/google-translate": "^2.0.0",
     "@prisma/client": "^4.5.0",
     "jsdom": "^20.0.1",
     "sqlite3": "^5.1.2",

@@ -11,12 +11,12 @@ export abstract class Validator {
     protected constructor (found: Element, rule: Rule) {
         this.found = found;
         this.rule = rule;
-        this.invalidation = rule.constructQuerySelector()[0];
+        this.invalidation = rule.constructQuerySelector()[1];
     }
 
     private beforeValidate(): void {
         for (const ignoredChar of this.ignoredChars) {
-            this.invalidation.replaceAll(ignoredChar, '');
+            this.invalidation = this.invalidation.replaceAll(ignoredChar, '');
         }
     }
     

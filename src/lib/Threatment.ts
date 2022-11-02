@@ -48,8 +48,8 @@ export default class Threatment {
         }); 
     }
 
-    async classifyMessage (message: string): Promise<ChainingType | null> { 
-        return await prisma.$queryRaw<ChainingType>(
+    async classifyMessage (message: string): Promise<Array<ChainingType> | null> { 
+        return await prisma.$queryRaw<Array<ChainingType>>(
             Prisma.sql`SELECT * FROM ChainingType
             WHERE INSTR(${message}, messageCode) 
             LIMIT 1;

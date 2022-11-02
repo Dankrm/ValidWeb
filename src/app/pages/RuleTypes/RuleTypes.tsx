@@ -1,14 +1,6 @@
 import React, { ChangeEvent, useState } from 'react';
 import { vscodeAPI } from '../../lib/VSCodeApi';
 
-type RuleType = {
-  id: number,
-  code: string,
-  type: string,
-  diagnostic: number,
-  visible: boolean
-};
-
 vscodeAPI.postMessage(
   {
     type: 'loadRuleTypes',

@@ -23,7 +23,7 @@ export default class Rule {
             }
 
             if (this.rule.validationElement !== ''){
-                query = query.replaceAll('y', this.rule.basedElement);
+                query = query.replaceAll('y', this.rule.validationElement);
             }
 
             [has, dontHas] = query.split('$');

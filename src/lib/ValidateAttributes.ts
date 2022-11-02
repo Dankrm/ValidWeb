@@ -13,7 +13,9 @@ export class ValidateAttributes extends Validator {
 		let attributefound = false;
 		for (const attribute of this.found.getAttributeNames()) {
 			if (attribute === this.invalidation) {
-				attributefound = true;
+                if (this.found.getAttribute(attribute) !== '') {
+                    attributefound = true;
+                }
 			}
 		}
         return attributefound;

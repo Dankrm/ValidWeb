@@ -97,12 +97,12 @@ export class Diagnostic {
 	}
 
 	public subscribeToDocumentChanges(context: vscode.ExtensionContext): void {
-		if (vscode.window.activeTextEditor) {
-			this.clearDiagnostics();
-			Threatment.getInstance().requestDataToThreatment(vscode.window.activeTextEditor.document.getText()).then(async response => {
-				vscode.window.activeTextEditor && await this.refreshDiagnostics(vscode.window.activeTextEditor.document);
-			});
-		}
+		// if (vscode.window.activeTextEditor) {
+		// 	this.clearDiagnostics();
+		// 	Threatment.getInstance().requestDataToThreatment(vscode.window.activeTextEditor.document.getText()).then(async response => {
+		// 		vscode.window.activeTextEditor && await this.refreshDiagnostics(vscode.window.activeTextEditor.document);
+		// 	});
+		// }
 
 		context.subscriptions.push(
 			vscode.workspace.onDidChangeTextDocument(editor => {

@@ -88,3 +88,8 @@ input::placeholder,
 textarea::placeholder {
 	color: var(--vscode-input-placeholderForeground);
 }
+
+.checkbox-item {
+	margin-top: 10px;
+	user-select: none;
+}

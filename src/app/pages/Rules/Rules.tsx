@@ -1,16 +1,6 @@
 import React, { ChangeEvent, useState } from 'react';
 import { vscodeAPI } from '../../lib/VSCodeApi';
 
-type Rules = {
-  id: number,
-  ruleTypeId: number,
-  chainingTypeId: number,
-  description: string,
-  basedElement: string,
-  validationElement: string,
-  visible: boolean
-};
-
 export default function RuleTypes() {
   const [rules, setRules] = useState<Rules[]>([]);
 
@@ -48,12 +38,12 @@ export default function RuleTypes() {
       <div className="btn-controls">
         
       </div>
-      { rules && rules.map((ruleType, index) => {
+      { rules && rules.map((rule, index) => {
         return (
-          <div>
-            <label htmlFor="" key={ruleType.id}>
-              <input defaultChecked={ruleType.visible} type="checkbox" value={ruleType.id} onChange={onChangeRule} />
-              {ruleType.basedElement} e {ruleType.validationElement}
+          <div className="checkbox-item" key={rule.id}>
+            <label>
+              <input defaultChecked={rule.visible} type="checkbox" value={rule.id} onChange={onChangeRule} />
+              {rule.description}
             </label>
           </div>
         );

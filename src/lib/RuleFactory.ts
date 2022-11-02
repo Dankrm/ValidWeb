@@ -2,7 +2,7 @@ import ConcreteRule from "./Rule";
 import Rule from "./Rule";
 import Threatment from "./Threatment";
 import { PrismaClient } from "@prisma/client";
-const translate = require('translate-google');
+const translate = require('@iamtraction/google-translate');
 const prisma = new PrismaClient();
 
 type IValidatorMessage = {
@@ -28,16 +28,17 @@ export default class RuleFactory {
 
     async buildRule (outerMessage: IValidatorMessage): Promise<void> {
         try {
+            debugger
             const message = outerMessage.message;
             if (message) {
-                const messageTranslated = await translate(message, {from: 'en', to: 'pt'});
-                const messageClassify = await Threatment.getInstance().classifyMessage(String(message).toLocaleLowerCase());
+                const messageTranslated = (await translate(message, {from: 'en', to: 'pt'})).text;
+                const chainingType = await Threatment.getInstance().classifyMessage(String(message).toLocaleLowerCase());
                 const ruleTypeClassify = await Threatment.getInstance().classifyRuleType(outerMessage.type);
-                if (messageClassify !== null && ruleTypeClassify !== null) {
-                    const [elementToValidate, validation] = this.searchForElements(message.toLowerCase());         
+                if (chainingType !== null && ruleTypeClassify !== null) {
+                    const [elementToValidate, validation] = this.searchForElements(message.toLowerCase());    
                     await prisma.rule.create({
                         data: {
-                            chainingTypeId: ruleTypeClassify.id,
+                            chainingTypeId: chainingType[0].id,
                             ruleTypeId: ruleTypeClassify.id,
                             basedElement: elementToValidate,
                             description: messageTranslated,
@@ -47,7 +48,7 @@ export default class RuleFactory {
                 }
             }
         } catch (error) {
-            console.error(error);
+            console.error("Regra existente");
         }
     }
 
