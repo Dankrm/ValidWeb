@@ -4,9 +4,9 @@ const prisma = new PrismaClient();
 const chainingTypes = [
 	{
 		chain: "unclosed",
-		selector: "unclosed",
+		selector: "/>",
 		messageCode: "unclosed element",
-		invalidation: "$/>"
+		invalidation: "x$"
 	},
 	{
 		chain: "emptyContent",
@@ -81,9 +81,9 @@ const chainingTypes = [
 		invalidation: "$?x"
 	},
 	{
-		chain: "except",
-		selector: "except",
-		messageCode: "except",
+		chain: "undefined",
+		selector: "undefined",
+		messageCode: "undefined",
 		invalidation: "$x"
 	}
 ];

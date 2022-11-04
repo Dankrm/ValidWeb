@@ -61,6 +61,7 @@
   },
   "devDependencies": {
     "@types/glob": "^7.2.0",
+    "@types/jsdom": "^20.0.0",
     "@types/mocha": "^9.1.1",
     "@types/node": "16.x",
     "@types/react": "^18.0.21",

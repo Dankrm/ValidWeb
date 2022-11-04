@@ -28,14 +28,13 @@ export default class RuleFactory {
 
     async buildRule (outerMessage: IValidatorMessage): Promise<void> {
         try {
-            debugger
             const message = outerMessage.message;
             if (message) {
                 const messageTranslated = (await translate(message, {from: 'en', to: 'pt'})).text;
                 const chainingType = await Threatment.getInstance().classifyMessage(String(message).toLocaleLowerCase());
                 const ruleTypeClassify = await Threatment.getInstance().classifyRuleType(outerMessage.type);
                 if (chainingType !== null && ruleTypeClassify !== null) {
-                    const [elementToValidate, validation] = this.searchForElements(message.toLowerCase());    
+                    const [elementToValidate, validation] = this.searchForElements(message.toLowerCase());   
                     await prisma.rule.create({
                         data: {
                             chainingTypeId: chainingType[0].id,
@@ -48,7 +47,7 @@ export default class RuleFactory {
                 }
             }
         } catch (error) {
-            console.error("Regra existente");
+            console.error(error);
         }
     }
 
@@ -57,7 +56,7 @@ export default class RuleFactory {
         let validation = '';
         let found = 0;
         let foundCount = 0;
-        let searchWords = ['element', 'attribute', 'expected'];
+        let searchWords = ['element', 'attribute', 'expected', 'start'];
         let searchSlashes = ['“', '”'];
 
         for (const searchWord of searchWords) { 

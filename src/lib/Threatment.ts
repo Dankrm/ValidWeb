@@ -55,4 +55,24 @@ export default class Threatment {
             LIMIT 1;
         `);
     }
+    
+    public constructQuerySelector (basedElement: string, validationElement: string, chainingType: ChainingType): [string, string] {
+        let query = '';
+        let has = '';
+        let dontHas = '';
+        if (chainingType.invalidation !== '') {
+            query = chainingType.invalidation;
+            if (basedElement !== ''){
+                query = query.replaceAll('x', basedElement);
+            }
+            if (validationElement !== ''){
+                query = query.replaceAll('y', validationElement);
+            }
+            [has, dontHas] = query.split('$');
+        } else {
+
+        }
+
+        return [has, dontHas];
+    }
 }

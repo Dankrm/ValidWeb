@@ -9,8 +9,6 @@ const { JSDOM } = jsdom;
 
 const prisma = new PrismaClient();
 
-export const errorMention = "html_error";
-
 export class Diagnostic {
 	private static instance: Diagnostic;
 	private diagnostics: vscode.Diagnostic[] = [];
@@ -24,15 +22,17 @@ export class Diagnostic {
         return Diagnostic.instance;
     }
 
+	public addDiagnostic(diagnostic: vscode.Diagnostic) {
+		this.diagnostics.push(diagnostic);
+	}
+
 	public clearDiagnostics() {
 		this.diagnostics = [];
 		Diagnostic.htmlDiagnostics.clear();
 	}
 
 	public async refreshDiagnostics(doc: vscode.TextDocument): Promise<void> {
-		const jsdom = new JSDOM(doc.getText(), { includeNodeLocations: true });
-		const document = jsdom.window.document;
-
+		this.clearDiagnostics();
 		const rules = await prisma.rule.findMany({
 			include: {
 				ruleType: true,
@@ -46,38 +46,13 @@ export class Diagnostic {
 			}
 		});
 
+		const jsdom = new JSDOM(doc.getText(), { includeNodeLocations: true });
+
 		for (const rule of rules) {
 			try {
 				const ruleModel = new Rule(rule);
-				const selector = ruleModel.constructQuerySelector();
-				if (selector[0]) {
-					const foundElements = document.querySelectorAll(selector[0]);
-					if (selector[1]) {
-						if (foundElements) {
-							for (const foundElement of foundElements) {
-								const foundElementLocation = jsdom.nodeLocation(foundElement);
-								if (foundElementLocation) {
-									const validator = this.getValidatorByRule(foundElement, ruleModel);
-									const validate = validator?.execute();
-									if (!validate) {
-										this.diagnostics.push(this.createDiagnostic(foundElementLocation.startLine - 1, foundElementLocation.startCol, ruleModel));
-									}
-								} else {
-									this.showInformationMessage(ruleModel.getRule().description);
-								}
-							}
-						} else {
-							this.showInformationMessage(ruleModel.getRule().description);
-						}
-					} else {
-						for (const found of foundElements) {
-							const foundElement = jsdom.nodeLocation(found);
-							this.diagnostics.push(this.createDiagnostic(foundElement.startLine - 1, foundElement.startCol, ruleModel));
-						}
-					} 
-				} else {
-					this.showInformationMessage(ruleModel.getRule().description);
-				}
+				const validator = this.getValidatorByRule(ruleModel, jsdom);
+				validator?.execute();		
 			} catch (error) {
 				console.log(error);
 			}
@@ -85,29 +60,20 @@ export class Diagnostic {
 		Diagnostic.htmlDiagnostics.set(doc.uri, this.diagnostics);
 	}
 
-	private createDiagnostic(line: number, column: number, rule: Rule): vscode.Diagnostic {
-		const range = new vscode.Range(line, column, line, column + rule.getRule().basedElement.length);
-		const diagnostic = new vscode.Diagnostic(range, rule.getRule().description, rule.getRule().ruleType.diagnostic);
-		diagnostic.code = errorMention;
-		return diagnostic;
-	}
-
 	private showInformationMessage(message: string): void {
 		vscode.window.showInformationMessage(message);
 	}
 
 	public subscribeToDocumentChanges(context: vscode.ExtensionContext): void {
-		// if (vscode.window.activeTextEditor) {
-		// 	this.clearDiagnostics();
-		// 	Threatment.getInstance().requestDataToThreatment(vscode.window.activeTextEditor.document.getText()).then(async response => {
-		// 		vscode.window.activeTextEditor && await this.refreshDiagnostics(vscode.window.activeTextEditor.document);
-		// 	});
-		// }
+		if (vscode.window.activeTextEditor) {
+			vscode.window.activeTextEditor && this.refreshDiagnostics(vscode.window.activeTextEditor.document);
+			// Threatment.getInstance().requestDataToThreatment(vscode.window.activeTextEditor.document.getText()).then(async response => {
+			// });
+		}
 
 		context.subscriptions.push(
 			vscode.workspace.onDidChangeTextDocument(editor => {
 				if (editor) {
-					this.clearDiagnostics();
 					this.refreshDiagnostics(editor.document);
 				}
 			})
@@ -123,7 +89,6 @@ export class Diagnostic {
 
 		context.subscriptions.push(
 			vscode.workspace.onDidSaveTextDocument(editor => {
-				this.clearDiagnostics();
 				Threatment.getInstance().requestDataToThreatment(editor.getText()).then(response => {
 					this.refreshDiagnostics(editor);
 				});
@@ -135,8 +100,8 @@ export class Diagnostic {
 		);
 	}
 
-	getValidatorByRule (found: Element, rule: Rule): Validator | null {
-		return ValidatorFactory.methodFactory(found, rule);
+	getValidatorByRule (rule: Rule, jsdom: any): Validator | null {
+		return ValidatorFactory.methodFactory(rule, jsdom);
 	}
 
 }
