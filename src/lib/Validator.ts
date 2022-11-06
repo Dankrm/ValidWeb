@@ -1,7 +1,8 @@
 import { Diagnostic } from "./Diagnostic";
 import Rule from "./Rule";
 import * as vscode from 'vscode';
-import Threatment from "./Threatment";
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
 
 export const errorMention = "html_error";
 export abstract class Validator {
@@ -10,12 +11,14 @@ export abstract class Validator {
     protected invalidation: [string, string] = ['', ''];
     protected rule: Rule;
     protected jsdom: any;
+    protected doc: vscode.TextDocument;
     protected elements: Element[] = [];
 
-    protected constructor (rule: Rule, jsdom: any) {
+    public constructor (rule: Rule, doc: vscode.TextDocument) {
         this.rule = rule;
-        this.jsdom = jsdom;
-        this.invalidation = Threatment.getInstance().constructQuerySelector(rule.getRule().basedElement, rule.getRule().validationElement, rule.getRule().chainingType);
+        this.doc = doc;
+        this.jsdom = new JSDOM(doc.getText(), { includeNodeLocations: true });
+        this.invalidation = rule.constructQuerySelector();
     }
 
     private beforeValidate(): void {
@@ -29,10 +32,26 @@ export abstract class Validator {
     }
     
     protected abstract customValidate(): void;
+    protected abstract customCreateFix(diagnostic: vscode.Diagnostic): vscode.CodeAction;
+
+    public createFix (diagnostic: vscode.Diagnostic): vscode.CodeAction {
+        this.beforeValidate();
+        return this.customCreateFix(diagnostic);
+    };
+    
+    protected alternativeValidate(): void {
+        Diagnostic.getInstance().showInformationMessage(this.rule.getRule().description);
+    }
 
     private validate(): void {
-        this.beforeValidate();
-        this.customValidate();
+        try {
+            this.beforeValidate();
+            this.customValidate();
+        } catch (e) {
+            if (e instanceof Error) {
+                this.alternativeValidate();
+            }
+        }
     }
 
     public execute(): void {
@@ -43,14 +62,13 @@ export abstract class Validator {
 		return this.jsdom.nodeLocation(element);
 	}
 
-    public getDiagnostic (found: any): vscode.Diagnostic {
-		return this.createDiagnostic(found.startLine - 1, found.startCol);
-	}
-
-	private createDiagnostic(line: number, column: number): vscode.Diagnostic {
-		const range = new vscode.Range(line, column, line, column + this.rule.getRule().basedElement.length);
+	protected createDiagnostic(range: any): vscode.Diagnostic {
 		const diagnostic = new vscode.Diagnostic(range, this.rule.getRule().description, this.rule.getRule().ruleType.diagnostic);
-		diagnostic.code = errorMention;
+		diagnostic.code = this.rule.getRule().id;
 		return diagnostic;
 	}
+
+    protected createRangeFromNodeLocation (found: any): vscode.Range {
+        return new vscode.Range(found.startLine - 1, found.startCol - 1, found.endLine - 1, found.endCol -1);
+    }
 }

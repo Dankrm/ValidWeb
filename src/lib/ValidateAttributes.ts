@@ -1,15 +1,12 @@
 
+import { CodeAction } from "vscode";
 import { Diagnostic } from "./Diagnostic";
-import Rule from "./Rule";
 import { Validator } from "./Validator";
+import * as vscode from 'vscode';
 
 export class ValidateAttributes extends Validator {
     protected chain = "[";
     protected ignoredChars = ['[', ']'];
-    
-    public constructor (rule: Rule, jsdom: any) {
-        super(rule, jsdom);
-    }
 
     protected customValidate(): void {
         for (const element of this.elements) {
@@ -23,10 +20,27 @@ export class ValidateAttributes extends Validator {
             }
             if (!attributefound) {
                 const found = this.getLocation(element);
-                Diagnostic.getInstance().addDiagnostic(this.getDiagnostic(found));
+                if (found.attrs && found.attrs[this.invalidation[1]]) {
+                    const foundAttr = found.attrs[this.invalidation[1]];
+                    const range = this.createRangeFromNodeLocation(foundAttr);
+                    Diagnostic.getInstance().addDiagnostic(this.createDiagnostic(range));
+                } else {
+                    const range = this.createRangeFromNodeLocation(found.startTag);
+                    Diagnostic.getInstance().addDiagnostic(this.createDiagnostic(range));
+                }
             }
         }
-
     }
 
+    public customCreateFix(diagnostic: vscode.Diagnostic): CodeAction {
+        const fix = new vscode.CodeAction(this.rule.getRule().description, vscode.CodeActionKind.QuickFix);
+		fix.edit = new vscode.WorkspaceEdit();
+        if (this.invalidation[1]) {
+            const position = new vscode.Position(diagnostic.range.start.line, diagnostic.range.start.character + this.invalidation[0].length + 1);
+            fix.edit.insert(this.doc.uri, position, ` ${this.invalidation[1]}="" `);
+        } else {
+            fix.edit.delete(this.doc.uri, diagnostic.range);
+        }
+		return fix;
+    }
 }

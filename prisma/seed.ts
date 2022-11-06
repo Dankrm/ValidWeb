@@ -40,7 +40,7 @@ const chainingTypes = [
 	},
 	{
 		chain: "language",
-		selector: "language",
+		selector: "[",
 		messageCode: "start tag to declare the language of this document",
 		invalidation: "y$[x]"
 	},       
@@ -75,8 +75,8 @@ const chainingTypes = [
 		invalidation: "$?x"
 	},
 	{
-		chain: "doctype",
-		selector: "doctype",
+		chain: "content",
+		selector: "content",
 		messageCode: "end of file seen without seeing a doctype first. expected",
 		invalidation: "$?x"
 	},
@@ -98,7 +98,7 @@ const ruleTypes = [
 	{
 		code: "info",
 		type: "Informação",
-		diagnostic: 3,
+		diagnostic: 1,
 		visible: true
 	},
 ];

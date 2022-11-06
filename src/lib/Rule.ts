@@ -5,10 +5,29 @@ export default class Rule {
         private readonly rule: DbRule & {
             ruleType: RuleType;
             chainingType: ChainingType;
-        }
-        ) {}
+        }) {}
 
     getRule() {
         return this.rule;
+    }
+
+    public constructQuerySelector (): [string, string] {
+        let query = '';
+        let has = '';
+        let dontHas = '';
+        if (this.rule.chainingType.invalidation !== '') {
+            query = this.rule.chainingType.invalidation;
+            if (this.rule.basedElement !== ''){
+                query = query.replaceAll('x', this.rule.basedElement);
+            }
+            if (this.rule.validationElement !== ''){
+                query = query.replaceAll('y', this.rule.validationElement);
+            }
+            [has, dontHas] = query.split('$');
+        } else {
+
+        }
+
+        return [has, dontHas];
     }
 }

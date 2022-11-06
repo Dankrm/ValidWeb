@@ -4,8 +4,6 @@ import Rule from './Rule';
 import Threatment from './Threatment';
 import { Validator } from './Validator';
 import { ValidatorFactory } from './ValidatorFactory';
-const jsdom = require("jsdom");
-const { JSDOM } = jsdom;
 
 const prisma = new PrismaClient();
 
@@ -14,7 +12,6 @@ export class Diagnostic {
 	private diagnostics: vscode.Diagnostic[] = [];
 	public static htmlDiagnostics = vscode.languages.createDiagnosticCollection("validweb");
 
-	
 	public static getInstance(): Diagnostic {
         if (!Diagnostic.instance) {
             Diagnostic.instance = new Diagnostic();
@@ -26,13 +23,15 @@ export class Diagnostic {
 		this.diagnostics.push(diagnostic);
 	}
 
-	public clearDiagnostics() {
+	public clearDiagnosticsList() {
 		this.diagnostics = [];
+	}
+
+	public clearDiagnosticsCollection() {
 		Diagnostic.htmlDiagnostics.clear();
 	}
 
 	public async refreshDiagnostics(doc: vscode.TextDocument): Promise<void> {
-		this.clearDiagnostics();
 		const rules = await prisma.rule.findMany({
 			include: {
 				ruleType: true,
@@ -45,22 +44,21 @@ export class Diagnostic {
 				}
 			}
 		});
-
-		const jsdom = new JSDOM(doc.getText(), { includeNodeLocations: true });
-
+		this.clearDiagnosticsList();
 		for (const rule of rules) {
 			try {
 				const ruleModel = new Rule(rule);
-				const validator = this.getValidatorByRule(ruleModel, jsdom);
+				const validator = this.getValidatorByRule(ruleModel, doc);
 				validator?.execute();		
 			} catch (error) {
 				console.log(error);
 			}
 		}
+		this.clearDiagnosticsCollection();
 		Diagnostic.htmlDiagnostics.set(doc.uri, this.diagnostics);
 	}
 
-	private showInformationMessage(message: string): void {
+	public showInformationMessage(message: string): void {
 		vscode.window.showInformationMessage(message);
 	}
 
@@ -100,8 +98,8 @@ export class Diagnostic {
 		);
 	}
 
-	getValidatorByRule (rule: Rule, jsdom: any): Validator | null {
-		return ValidatorFactory.methodFactory(rule, jsdom);
+	getValidatorByRule (rule: Rule, doc: vscode.TextDocument): Validator | null {
+		return ValidatorFactory.methodFactory(rule, doc);
 	}
 
 }

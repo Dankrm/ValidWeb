@@ -1,11 +1,13 @@
 import * as vscode from 'vscode';
 import { SidebarRuleTypesProvider } from './SidebarRuleTypesProvider';
 import { SidebarRulesProvider } from './SidebarRulesProvider';
-import { HtmlCodeActionProvider } from './HtmlCodeActionProvider';
+import { DiagnosticCodeActionProvider } from './lib/DiagnosticCodeActionProvider';
 import { Diagnostic } from './lib/Diagnostic';
 
 
 export function activate(context: vscode.ExtensionContext) {
+	context.subscriptions.push(Diagnostic.htmlDiagnostics);
+	Diagnostic.getInstance().subscribeToDocumentChanges(context);
 
 	const provider = new SidebarRuleTypesProvider(context);
 	context.subscriptions.push(
@@ -18,13 +20,11 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 
 	context.subscriptions.push(
-		vscode.languages.registerCodeActionsProvider('validweb', new HtmlCodeActionProvider(), {
-			providedCodeActionKinds: HtmlCodeActionProvider.providedCodeActionKinds
+		vscode.languages.registerCodeActionsProvider('html', new DiagnosticCodeActionProvider(), {
+			providedCodeActionKinds: DiagnosticCodeActionProvider.providedCodeActionKinds
 		})
 	);
 
-	context.subscriptions.push(Diagnostic.htmlDiagnostics);
-	Diagnostic.getInstance().subscribeToDocumentChanges(context);
 }
 
 export function deactivate() {}

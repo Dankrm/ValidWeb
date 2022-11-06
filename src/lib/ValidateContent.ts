@@ -1,3 +1,4 @@
+import { CodeAction } from "vscode";
 import { Diagnostic } from "./Diagnostic";
 import Rule from "./Rule";
 import { Validator } from "./Validator";
@@ -5,10 +6,6 @@ import { Validator } from "./Validator";
 export class ValidateContent extends Validator {
     protected chain = "content";
     protected ignoredChars = [this.chain];
-    
-    public constructor (rule: Rule, jsdom: any) {
-        super(rule, jsdom);
-    }
 
     protected customValidate(): void {
         for (const element of this.elements) {
@@ -16,9 +13,13 @@ export class ValidateContent extends Validator {
 
             if (!content) {
                 const found = this.getLocation(element);
-                Diagnostic.getInstance().addDiagnostic(this.getDiagnostic(found));
+                const range = this.createRangeFromNodeLocation(found);
+                Diagnostic.getInstance().addDiagnostic(this.createDiagnostic(range));
             }
         }
     }
 
+    public customCreateFix(): CodeAction {
+        throw new Error("Method not implemented.");
+    }
 }

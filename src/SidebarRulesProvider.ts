@@ -53,7 +53,6 @@ export class SidebarRulesProvider implements vscode.WebviewViewProvider {
 							visible: data.visible
 						}
 					});
-					Diagnostic.getInstance().clearDiagnostics();
 					vscode.window.activeTextEditor?.document && 
 						Diagnostic.getInstance().refreshDiagnostics(vscode.window.activeTextEditor.document);
 					break;
