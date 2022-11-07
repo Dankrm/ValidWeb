@@ -72,13 +72,13 @@ const chainingTypes = [
 		chain: "doctype",
 		selector: "doctype",
 		messageCode: "non-space characters found without seeing a doctype first",
-		invalidation: "$?x"
+		invalidation: "$x"
 	},
 	{
 		chain: "content",
 		selector: "content",
 		messageCode: "end of file seen without seeing a doctype first. expected",
-		invalidation: "$?x"
+		invalidation: "$x"
 	},
 	{
 		chain: "undefined",

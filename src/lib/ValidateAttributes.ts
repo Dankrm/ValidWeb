@@ -36,8 +36,10 @@ export class ValidateAttributes extends Validator {
         const fix = new vscode.CodeAction(this.rule.getRule().description, vscode.CodeActionKind.QuickFix);
 		fix.edit = new vscode.WorkspaceEdit();
         if (this.invalidation[1]) {
-            const position = new vscode.Position(diagnostic.range.start.line, diagnostic.range.start.character + this.invalidation[0].length + 1);
-            fix.edit.insert(this.doc.uri, position, ` ${this.invalidation[1]}="" `);
+            if (!this.doc.lineAt(diagnostic.range.start.line).text.includes(this.invalidation[1])) {
+                const position = new vscode.Position(diagnostic.range.start.line, diagnostic.range.start.character + this.invalidation[0].length + 1);
+                fix.edit.insert(this.doc.uri, position, ` ${this.invalidation[1]}="" `);
+            }
         } else {
             fix.edit.delete(this.doc.uri, diagnostic.range);
         }

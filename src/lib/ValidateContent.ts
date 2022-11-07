@@ -1,6 +1,6 @@
 import { CodeAction } from "vscode";
 import { Diagnostic } from "./Diagnostic";
-import Rule from "./Rule";
+import * as vscode from 'vscode';
 import { Validator } from "./Validator";
 
 export class ValidateContent extends Validator {
@@ -19,7 +19,21 @@ export class ValidateContent extends Validator {
         }
     }
 
-    public customCreateFix(): CodeAction {
-        throw new Error("Method not implemented.");
+    public customCreateFix(diagnostic: vscode.Diagnostic): vscode.CodeAction {
+        const fix = new vscode.CodeAction(this.rule.getRule().description, vscode.CodeActionKind.QuickFix);
+		fix.edit = new vscode.WorkspaceEdit();
+        if (this.invalidation[1]) {
+            const position = new vscode.Position(diagnostic.range.start.line + 1, 0);
+            fix.edit.insert(this.doc.uri, position, `${this.invalidation[1]}\n`);
+        }
+        return fix;
+    }
+
+    protected alternativeValidate(): void {
+        const range = new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0));
+        if (!this.doc.getText().toLowerCase().includes(this.invalidation[1])) {
+            Diagnostic.getInstance().showInformationMessage(this.rule.getRule().description);
+            Diagnostic.getInstance().addDiagnostic(this.createDiagnostic(range));
+        }
     }
 }

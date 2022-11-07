@@ -26,7 +26,9 @@ export class DiagnosticCodeActionProvider implements vscode.CodeActionProvider {
 				const validator = ValidatorFactory.methodFactory(new Rule(rule), doc);
 				if (validator) {
 					const replace = validator.createFix(diagnostic);
-					fixArray.push(replace);
+					if (replace.edit?.size) {
+						fixArray.push(replace);
+					}
 				}
 			}
 		}

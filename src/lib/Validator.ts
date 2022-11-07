@@ -21,8 +21,7 @@ export abstract class Validator {
         this.invalidation = rule.constructQuerySelector();
     }
 
-    private beforeValidate(): void {
-        this.elements = this.jsdom.window.document.querySelectorAll(this.invalidation[0]);
+    private initInvalidation(): void {
         if (this.invalidation) {
             for (const igChar of this.ignoredChars) {
                 this.invalidation[0] && ( this.invalidation[0] = this.invalidation[0].replaceAll(igChar, ''));
@@ -30,12 +29,16 @@ export abstract class Validator {
             }
         }
     }
+
+    private initElements(): void {
+        this.elements = this.jsdom.window.document.querySelectorAll(this.invalidation[0]);
+    }
     
     protected abstract customValidate(): void;
     protected abstract customCreateFix(diagnostic: vscode.Diagnostic): vscode.CodeAction;
 
     public createFix (diagnostic: vscode.Diagnostic): vscode.CodeAction {
-        this.beforeValidate();
+        this.initInvalidation();
         return this.customCreateFix(diagnostic);
     };
     
@@ -45,7 +48,8 @@ export abstract class Validator {
 
     private validate(): void {
         try {
-            this.beforeValidate();
+            this.initInvalidation();
+            this.initElements();
             this.customValidate();
         } catch (e) {
             if (e instanceof Error) {
