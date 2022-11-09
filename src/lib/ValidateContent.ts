@@ -23,7 +23,7 @@ export class ValidateContent extends Validator {
         const fix = new vscode.CodeAction(this.rule.getRule().description, vscode.CodeActionKind.QuickFix);
 		fix.edit = new vscode.WorkspaceEdit();
         if (this.invalidation[1]) {
-            const position = new vscode.Position(diagnostic.range.start.line + 1, 0);
+            const position = new vscode.Position(diagnostic.range.start.line, 0);
             fix.edit.insert(this.doc.uri, position, `${this.invalidation[1]}\n`);
         }
         return fix;

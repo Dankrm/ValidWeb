@@ -15,6 +15,25 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "commands": [
+      {
+        "command": "validweb.refreshFiles",
+        "title": "Atualizar",
+        "icon": {
+            "light": "media/icons/light/refresh.svg",
+            "dark": "media/icons/dark/refresh.svg"
+        }
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "validweb.refreshFiles",
+          "when": "view == validweb-sidebar-tree",
+          "group": "navigation"
+        }
+      ]
+    },
     "viewsContainers": {
       "activitybar": [
         {

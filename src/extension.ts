@@ -3,6 +3,7 @@ import { SidebarRuleTypesProvider } from './SidebarRuleTypesProvider';
 import { SidebarRulesProvider } from './SidebarRulesProvider';
 import { DiagnosticCodeActionProvider } from './lib/DiagnosticCodeActionProvider';
 import { Diagnostic } from './lib/Diagnostic';
+import { TreeViewProvider } from './TreeView/TreeViewProvider';
 
 
 export function activate(context: vscode.ExtensionContext) {
@@ -25,6 +26,20 @@ export function activate(context: vscode.ExtensionContext) {
 		})
 	);
 
+	const filesTreeView = new TreeViewProvider((vscode.workspace.workspaceFolders) 
+	? vscode.workspace.workspaceFolders[0].uri.fsPath 
+	: undefined);
+
+	context.subscriptions.push(
+		vscode.window.registerTreeDataProvider('validweb-sidebar-tree', 
+			filesTreeView
+		)
+	);
+
+	vscode.commands.registerCommand('validweb.refreshFiles', () => {
+		filesTreeView.refresh();
+	});
+	
 }
 
 export function deactivate() {}
