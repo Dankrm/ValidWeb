@@ -78,11 +78,11 @@ export class TreeViewProvider implements vscode.TreeDataProvider<TreeViewItem> {
 					});
 
 					if (treeViewItems.length) {
-						treeItem = new TreeViewItem(path.basename(localPath), vscode.TreeItemCollapsibleState.Collapsed, treeViewItems);
+						treeItem = new TreeViewItem(path.basename(localPath), vscode.TreeItemCollapsibleState.Collapsed, localPath, treeViewItems);
 					}
 				} else {
 					if (path.extname(localPath) === '.html') {
-						treeItem = new TreeViewItem(path.basename(localPath), vscode.TreeItemCollapsibleState.None);
+						treeItem = new TreeViewItem(path.basename(localPath), vscode.TreeItemCollapsibleState.None, localPath);
 					}
 				}
 			}

@@ -24,7 +24,6 @@ export abstract class Validator {
     private initInvalidation(): void {
         if (this.invalidation) {
             for (const igChar of this.ignoredChars) {
-                this.invalidation[0] && ( this.invalidation[0] = this.invalidation[0].replaceAll(igChar, ''));
                 this.invalidation[1] && ( this.invalidation[1] = this.invalidation[1].replaceAll(igChar, ''));
             }
         }
@@ -43,13 +42,17 @@ export abstract class Validator {
     };
     
     protected alternativeValidate(): void {
-        Diagnostic.getInstance().showInformationMessage(this.rule.getRule().description);
+        this.showInformationMessage();
+    }
+
+    protected showInformationMessage(): void {
+        Diagnostic.getInstance().showInformationMessage(this.rule.getRule().description, this.doc);
     }
 
     private validate(): void {
         try {
-            this.initInvalidation();
             this.initElements();
+            this.initInvalidation();
             this.customValidate();
         } catch (e) {
             if (e instanceof Error) {

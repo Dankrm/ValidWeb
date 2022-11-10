@@ -32,8 +32,8 @@ export class ValidateContent extends Validator {
     protected alternativeValidate(): void {
         const range = new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0));
         if (!this.doc.getText().toLowerCase().includes(this.invalidation[1])) {
-            Diagnostic.getInstance().showInformationMessage(this.rule.getRule().description);
             Diagnostic.getInstance().addDiagnostic(this.createDiagnostic(range));
+            this.showInformationMessage();
         }
     }
 }

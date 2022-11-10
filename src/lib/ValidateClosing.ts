@@ -16,7 +16,7 @@ export class ValidateClosing extends Validator {
                 }
             } else {
                 const found = this.getLocation(element);
-                Diagnostic.getInstance().showInformationMessage(this.rule.getRule().description);
+                this.showInformationMessage();
             }
         }
     }

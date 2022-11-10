@@ -31,7 +31,7 @@ export class Diagnostic {
 		Diagnostic.htmlDiagnostics.clear();
 	}
 
-	public async refreshDiagnostics(doc: vscode.TextDocument): Promise<void> {
+	public async refreshDiagnostics(doc: vscode.TextDocument): Promise<vscode.Diagnostic[]> {
 		const rules = await prisma.rule.findMany({
 			include: {
 				ruleType: true,
@@ -56,10 +56,17 @@ export class Diagnostic {
 		}
 		this.clearDiagnosticsCollection();
 		Diagnostic.htmlDiagnostics.set(doc.uri, this.diagnostics);
+		return this.diagnostics;
 	}
 
-	public showInformationMessage(message: string): void {
-		vscode.window.showInformationMessage(message);
+	public showInformationMessage(message: string, doc?: vscode.TextDocument): void {
+		if (doc) {
+			if (vscode.window.activeTextEditor?.document === doc) {
+				vscode.window.showInformationMessage(message);
+			}
+		} else {
+			vscode.window.showInformationMessage(message);
+		}
 	}
 
 	public subscribeToDocumentChanges(context: vscode.ExtensionContext): void {
