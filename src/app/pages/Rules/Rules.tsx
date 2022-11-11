@@ -1,22 +1,21 @@
 import React, { ChangeEvent, useState } from 'react';
 import { vscodeAPI } from '../../lib/VSCodeApi';
 
-export default function RuleTypes() {
+vscodeAPI.postMessage(
+  {
+    type: 'loadRules',
+  }
+);  
+
+export default function Rules() {
   const [rules, setRules] = useState<Rules[]>([]);
-
-  vscodeAPI.postMessage(
-    {
-      type: 'loadRules',
-    }
-  );  
-
   vscodeAPI.onMessage((message) => {
     switch (message.data.type) {
       case 'loadedRules': {
         const tmpRules: Rules[] = [];
-        message.data.rules.forEach((rules: Rules) => {
-          tmpRules.push(rules);
-        });
+        for (let rule of message.data.rules) {
+          tmpRules.push(rule);
+        }
         setRules(tmpRules);
         break;
       }

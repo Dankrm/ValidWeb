@@ -5,24 +5,18 @@ vscodeAPI.postMessage(
   {
     type: 'loadRuleTypes',
   }
-);
+);  
 
 export default function RuleTypes () {
   const [ruleTypes, setRuleTypes] = useState<RuleType[]>([]);
-
-  vscodeAPI.postMessage(
-    {
-      type: 'loadRuleTypes',
-    }
-  );  
 
   vscodeAPI.onMessage((message) => {
     switch (message.data.type) {
       case 'loadedRuleTypes': {
         const tmpRuleTypes: RuleType[] = [];
-        message.data.ruleTypes.forEach((ruleType: RuleType) => {
+        for (let ruleType of message.data.ruleTypes) {
           tmpRuleTypes.push(ruleType);
-        });
+        }
         setRuleTypes(tmpRuleTypes);
         break;
       }
@@ -43,8 +37,8 @@ export default function RuleTypes () {
     <>
       { ruleTypes && ruleTypes.map((ruleType, index) => {
         return (
-          <div>
-            <label htmlFor="" key={ruleType.id}>
+          <div className="checkbox-item" key={ruleType.id}>
+            <label key={ruleType.id}>
               <input defaultChecked={ruleType.visible} type="checkbox" value={ruleType.id} onChange={onChangeRuleType} />
               {ruleType.type}
             </label>

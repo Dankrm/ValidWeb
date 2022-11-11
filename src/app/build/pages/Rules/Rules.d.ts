@@ -1,2 +1,2 @@
 /// <reference types="react" />
-export default function RuleTypes(): JSX.Element;
+export default function Rules(): JSX.Element;
