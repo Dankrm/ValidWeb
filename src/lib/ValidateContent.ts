@@ -14,7 +14,7 @@ export class ValidateContent extends Validator {
             if (!content) {
                 const found = this.getLocation(element);
                 const range = this.createRangeFromNodeLocation(found);
-                Diagnostic.getInstance().addDiagnostic(this.createDiagnostic(range));
+                this.addDiagnosticToDoc(this.createDiagnostic(range));
             }
         }
     }
@@ -32,7 +32,7 @@ export class ValidateContent extends Validator {
     protected alternativeValidate(): void {
         const range = new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0));
         if (!this.doc.getText().toLowerCase().includes(this.invalidation[1])) {
-            Diagnostic.getInstance().addDiagnostic(this.createDiagnostic(range));
+            this.addDiagnosticToDoc(this.createDiagnostic(range));
             this.showInformationMessage();
         }
     }

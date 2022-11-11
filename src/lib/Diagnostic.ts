@@ -1,4 +1,7 @@
 import { PrismaClient } from '@prisma/client';
+import { 
+	createHash
+ } from 'crypto';
 import * as vscode from 'vscode';
 import Rule from './Rule';
 import Threatment from './Threatment';
@@ -9,7 +12,7 @@ const prisma = new PrismaClient();
 
 export class Diagnostic {
 	private static instance: Diagnostic;
-	private diagnostics: vscode.Diagnostic[] = [];
+	private diagnostics: Map<string, vscode.Diagnostic[]> = new Map();
 	public static htmlDiagnostics = vscode.languages.createDiagnosticCollection("validweb");
 
 	public static getInstance(): Diagnostic {
@@ -19,19 +22,21 @@ export class Diagnostic {
         return Diagnostic.instance;
     }
 
-	public addDiagnostic(diagnostic: vscode.Diagnostic) {
-		this.diagnostics.push(diagnostic);
+	private getHashTextDocument (doc: vscode.TextDocument): string {
+		return createHash('sha1').update(doc.uri.path, 'binary').digest('hex');
 	}
 
-	public clearDiagnosticsList() {
-		this.diagnostics = [];
+	public addDiagnosticToDoc(doc: vscode.TextDocument, diagnostic: vscode.Diagnostic) {
+		const hash = this.getHashTextDocument(doc);
+		this.diagnostics.has(hash) ? this.diagnostics.get(hash)?.push(diagnostic) : this.diagnostics.set(hash, [diagnostic]);
 	}
 
-	public clearDiagnosticsCollection() {
-		Diagnostic.htmlDiagnostics.clear();
+	public clearDiagnosticsList(hash: string) {
+		this.diagnostics.get(hash)?.splice(0);
 	}
 
-	public async refreshDiagnostics(doc: vscode.TextDocument): Promise<vscode.Diagnostic[]> {
+	public async refreshDiagnostics(doc: vscode.TextDocument): Promise<vscode.Diagnostic[] | undefined> {
+		const hash = this.getHashTextDocument(doc);
 		const rules = await prisma.rule.findMany({
 			include: {
 				ruleType: true,
@@ -44,7 +49,7 @@ export class Diagnostic {
 				}
 			}
 		});
-		this.clearDiagnosticsList();
+		this.clearDiagnosticsList(hash);
 		for (const rule of rules) {
 			try {
 				const ruleModel = new Rule(rule);
@@ -54,9 +59,9 @@ export class Diagnostic {
 				console.log(error);
 			}
 		}
-		this.clearDiagnosticsCollection();
-		Diagnostic.htmlDiagnostics.set(doc.uri, this.diagnostics);
-		return this.diagnostics;
+
+		Diagnostic.htmlDiagnostics.set(doc.uri, this.diagnostics.get(hash));
+		return this.diagnostics.get(hash);
 	}
 
 	public showInformationMessage(message: string, doc?: vscode.TextDocument): void {

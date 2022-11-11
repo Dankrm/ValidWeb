@@ -23,10 +23,10 @@ export class ValidateAttributes extends Validator {
                 if (found.attrs && found.attrs[this.invalidation[1]]) {
                     const foundAttr = found.attrs[this.invalidation[1]];
                     const range = this.createRangeFromNodeLocation(foundAttr);
-                    Diagnostic.getInstance().addDiagnostic(this.createDiagnostic(range));
+                    this.addDiagnosticToDoc(this.createDiagnostic(range));
                 } else {
                     const range = this.createRangeFromNodeLocation(found.startTag);
-                    Diagnostic.getInstance().addDiagnostic(this.createDiagnostic(range));
+                    this.addDiagnosticToDoc(this.createDiagnostic(range));
                 }
             }
         }

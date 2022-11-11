@@ -19,12 +19,12 @@ export class ValidateChildren extends Validator {
                 if (!childrenfound) {
                     const found = this.getLocation(element);
                     const range = this.createRangeFromNodeLocation(found.startTag);
-                    Diagnostic.getInstance().addDiagnostic(this.createDiagnostic(range));
+                    this.addDiagnosticToDoc(this.createDiagnostic(range));
                 }
             } else {
                 const found = this.getLocation(element);
                 const range = this.createRangeFromNodeLocation(found);
-                Diagnostic.getInstance().addDiagnostic(this.createDiagnostic(range));
+                this.addDiagnosticToDoc(this.createDiagnostic(range));
             }
         }
     }

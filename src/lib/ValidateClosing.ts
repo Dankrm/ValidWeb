@@ -12,7 +12,7 @@ export class ValidateClosing extends Validator {
             if (this.invalidation[0]) {
                 const found = this.getLocation(element);
                 if (!found.endTag) { 
-                    Diagnostic.getInstance().addDiagnostic(this.createDiagnostic(found));
+                    this.addDiagnosticToDoc(this.createDiagnostic(found));
                 }
             } else {
                 const found = this.getLocation(element);

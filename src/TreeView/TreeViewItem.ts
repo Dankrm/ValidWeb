@@ -32,7 +32,7 @@ export class TreeViewItem extends vscode.TreeItem {
     } else {
       vscode.workspace.openTextDocument(localPath).then(async (doc) => {
         const diagnostics = await Diagnostic.getInstance().refreshDiagnostics(doc);
-        if (diagnostics.length > 0) {
+        if (diagnostics && diagnostics.length > 0) {
           this.valid = false;
           this.iconPath = new vscode.ThemeIcon('error');
         } else {

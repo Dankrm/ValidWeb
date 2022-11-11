@@ -78,4 +78,8 @@ export abstract class Validator {
     protected createRangeFromNodeLocation (found: any): vscode.Range {
         return new vscode.Range(found.startLine - 1, found.startCol - 1, found.endLine - 1, found.endCol -1);
     }
+
+    protected addDiagnosticToDoc (diagnostic: vscode.Diagnostic): void {
+        Diagnostic.getInstance().addDiagnosticToDoc(this.doc, diagnostic);
+    }
 }
