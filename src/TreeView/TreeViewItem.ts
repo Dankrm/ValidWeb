@@ -29,6 +29,7 @@ export class TreeViewItem extends vscode.TreeItem {
       } else {
         this.iconPath = new vscode.ThemeIcon('folder');
       }
+      this.contextValue = 'htmlFolder';
     } else {
       vscode.workspace.openTextDocument(localPath).then(async (doc) => {
         const diagnostics = await Diagnostic.getInstance().refreshDiagnostics(doc);
@@ -45,6 +46,7 @@ export class TreeViewItem extends vscode.TreeItem {
         command: "vscode.open",
         arguments: [this.resourceUri]
       };
+      this.contextValue = 'htmlFile';
     }
   }
 }

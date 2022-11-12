@@ -20,8 +20,16 @@
         "command": "validweb.refreshFiles",
         "title": "Atualizar",
         "icon": {
-            "light": "media/icons/light/refresh.svg",
-            "dark": "media/icons/dark/refresh.svg"
+          "light": "media/icons/light/refresh.svg",
+          "dark": "media/icons/dark/refresh.svg"
+        }
+      }, 
+      {
+        "command": "validweb.generateFileReport",
+        "title": "Gerar Relatório",
+        "icon": {
+          "light": "media/icons/light/refresh.svg",
+          "dark": "media/icons/dark/refresh.svg"
         }
       }
     ],
@@ -31,6 +39,12 @@
           "command": "validweb.refreshFiles",
           "when": "view == validweb-sidebar-tree",
           "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "validweb.generateFileReport",
+          "when": "view == validweb-sidebar-tree && viewItem == htmlFile"
         }
       ]
     },
@@ -49,8 +63,7 @@
           "type": "tree",
           "id": "validweb-sidebar-tree",
           "name": "Arquivos",
-          "contextualTitle": "Arquivos",
-          "icon": "media/edit.svg"
+          "contextualTitle": "Arquivos"
         },
         {
           "type": "webview",
@@ -114,6 +127,7 @@
     "@iamtraction/google-translate": "^2.0.0",
     "@prisma/client": "^4.5.0",
     "jsdom": "^20.0.1",
+    "pdfkit": "^0.13.0",
     "sqlite3": "^5.1.2",
     "translate-google": "^1.5.0",
     "xml2js": "^0.4.23"

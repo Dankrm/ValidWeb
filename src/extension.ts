@@ -4,11 +4,11 @@ import { SidebarRulesProvider } from './SidebarRulesProvider';
 import { DiagnosticCodeActionProvider } from './lib/DiagnosticCodeActionProvider';
 import { Diagnostic } from './lib/Diagnostic';
 import { TreeViewProvider } from './TreeView/TreeViewProvider';
+import { Report } from './lib/Report';
 
 
-export function activate(context: vscode.ExtensionContext) {
-	context.subscriptions.push(Diagnostic.htmlDiagnostics);
-	Diagnostic.getInstance().subscribeToDocumentChanges(context);
+export async function activate(context: vscode.ExtensionContext) {
+	await Diagnostic.getInstance().subscribeToDocumentChanges(context);
 
 	const provider = new SidebarRuleTypesProvider(context);
 	context.subscriptions.push(
@@ -21,7 +21,7 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 
 	context.subscriptions.push(
-		vscode.languages.registerCodeActionsProvider('html', new DiagnosticCodeActionProvider(), {
+		vscode.languages.registerCodeActionsProvider({ scheme: 'file', language: 'html' }, new DiagnosticCodeActionProvider(), {
 			providedCodeActionKinds: DiagnosticCodeActionProvider.providedCodeActionKinds
 		})
 	);
@@ -38,6 +38,21 @@ export function activate(context: vscode.ExtensionContext) {
 
 	vscode.commands.registerCommand('validweb.refreshFiles', () => {
 		filesTreeView.refresh();
+	});
+
+	vscode.commands.registerCommand('validweb.generateFileReport', async (localContext) => {
+		const diagnostics = Diagnostic.getInstance().getDiagnosticsOfPath(localContext.resourceUri.path);
+		if (diagnostics) {
+			await vscode.window.withProgress({
+				location: vscode.ProgressLocation.Notification,
+				cancellable: true
+			}, async (progress) => {
+				progress.report({
+					message: `Carregando PDF ...`,
+				});
+				await Report.generateForFile(diagnostics);
+			});
+		}
 	});
 	
 }
