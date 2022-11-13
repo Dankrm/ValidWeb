@@ -50,7 +50,7 @@ export async function activate(context: vscode.ExtensionContext) {
 				progress.report({
 					message: `Carregando PDF ...`,
 				});
-				await Report.generateForFile(diagnostics);
+				await Report.generateForFile(diagnostics, localContext.resourceUri);
 			});
 		}
 	});

@@ -115,5 +115,4 @@ export class Diagnostic {
 	public getValidatorByRule (rule: Rule, doc: vscode.TextDocument): Validator | null {
 		return ValidatorFactory.methodFactory(rule, doc);
 	}
-
 }
