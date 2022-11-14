@@ -31,6 +31,14 @@
           "light": "media/icons/light/refresh.svg",
           "dark": "media/icons/dark/refresh.svg"
         }
+      },
+      {
+        "command": "validweb.generateFolderReport",
+        "title": "Gerar Relatório do Diretório",
+        "icon": {
+          "light": "media/icons/light/refresh.svg",
+          "dark": "media/icons/dark/refresh.svg"
+        }
       }
     ],
     "menus": {
@@ -45,6 +53,10 @@
         {
           "command": "validweb.generateFileReport",
           "when": "view == validweb-sidebar-tree && viewItem == htmlFile"
+        },
+        {
+          "command": "validweb.generateFolderReport",
+          "when": "view == validweb-sidebar-tree && viewItem == htmlFolder"
         }
       ]
     },

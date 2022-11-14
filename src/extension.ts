@@ -40,19 +40,29 @@ export async function activate(context: vscode.ExtensionContext) {
 		filesTreeView.refresh();
 	});
 
+	const report = new Report();
 	vscode.commands.registerCommand('validweb.generateFileReport', async (localContext) => {
-		const diagnostics = Diagnostic.getInstance().getDiagnosticsOfPath(localContext.resourceUri.path);
-		if (diagnostics) {
-			await vscode.window.withProgress({
-				location: vscode.ProgressLocation.Notification,
-				cancellable: true
-			}, async (progress) => {
-				progress.report({
-					message: `Carregando PDF ...`,
-				});
-				await Report.generateForFile(diagnostics, localContext.resourceUri);
+		await vscode.window.withProgress({
+			location: vscode.ProgressLocation.Notification,
+			cancellable: true
+		}, async (progress) => {
+			progress.report({
+				message: `Carregando PDF ...`,
 			});
-		}
+			await report.generateForFile(localContext.resourceUri);
+		});
+	});
+
+	vscode.commands.registerCommand('validweb.generateFolderReport', async (localContext) => {
+		await vscode.window.withProgress({
+			location: vscode.ProgressLocation.Notification,
+			cancellable: true
+		}, async (progress) => {
+			progress.report({
+				message: `Carregando PDF ...`,
+			});
+			await report.generateForFolder(localContext);
+		});
 	});
 	
 }
