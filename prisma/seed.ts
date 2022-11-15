@@ -103,7 +103,7 @@ const ruleTypes = [
 	},
 ];
 
-const load = async () => {
+export const load = async () => {
   try {
 	await prisma.rule.deleteMany();
 	await prisma.ruleType.deleteMany();

@@ -4,7 +4,7 @@
   "description": "",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.71.0"
+    "vscode": "^1.72.0"
   },
   "categories": [
     "Other"
@@ -26,19 +26,11 @@
       }, 
       {
         "command": "validweb.generateFileReport",
-        "title": "Gerar Relatório",
-        "icon": {
-          "light": "media/icons/light/refresh.svg",
-          "dark": "media/icons/dark/refresh.svg"
-        }
+        "title": "Gerar Relatório"
       },
       {
         "command": "validweb.generateFolderReport",
-        "title": "Gerar Relatório do Diretório",
-        "icon": {
-          "light": "media/icons/light/refresh.svg",
-          "dark": "media/icons/dark/refresh.svg"
-        }
+        "title": "Gerar Relatório do Diretório"
       }
     ],
     "menus": {
@@ -65,7 +57,7 @@
         {
           "id": "validweb-sidebar-view",
           "title": "ValidWeb",
-          "icon": "media/edit.svg"
+          "icon": "media/logo.svg"
         }
       ]
     },

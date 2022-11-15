@@ -1,10 +1,10 @@
 import NuRequest from "./NuRequest";
 import Rule from "./Rule";
-import RuleFactory from "./RuleFactory";
+import { RuleFactory } from "./RuleFactory";
 import { PrismaClient, Prisma, RuleType, ChainingType } from '@prisma/client';
 const prisma = new PrismaClient();
 
-export default class Threatment {
+export class Threatment {
     private static instance: Threatment;
     private nuRequest: NuRequest;
 

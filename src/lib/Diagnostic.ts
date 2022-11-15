@@ -4,7 +4,7 @@ import {
  } from 'crypto';
 import * as vscode from 'vscode';
 import Rule from './Rule';
-import Threatment from './Threatment';
+import { Threatment } from './Threatment';
 import { Validator } from './Validator';
 import { ValidatorFactory } from './ValidatorFactory';
 
@@ -14,6 +14,8 @@ export class Diagnostic {
 	private static instance: Diagnostic;
 	private diagnostics: Map<string, vscode.Diagnostic[]> = new Map();
 	public static htmlDiagnostics = vscode.languages.createDiagnosticCollection("validweb");
+
+	private constructor() {};
 
 	public static getInstance(): Diagnostic {
         if (!Diagnostic.instance) {

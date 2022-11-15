@@ -5,9 +5,13 @@ import { DiagnosticCodeActionProvider } from './lib/DiagnosticCodeActionProvider
 import { Diagnostic } from './lib/Diagnostic';
 import { TreeViewProvider } from './TreeView/TreeViewProvider';
 import { Report } from './lib/Report';
+import { PrismaClient } from '@prisma/client';
+import { exec } from 'child_process';
+const connection = new PrismaClient();
 
 
 export async function activate(context: vscode.ExtensionContext) {
+
 	await Diagnostic.getInstance().subscribeToDocumentChanges(context);
 
 	const provider = new SidebarRuleTypesProvider(context);

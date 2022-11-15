@@ -1,6 +1,6 @@
 import ConcreteRule from "./Rule";
 import Rule from "./Rule";
-import Threatment from "./Threatment";
+import { Threatment } from "./Threatment";
 import { PrismaClient } from "@prisma/client";
 const translate = require('@iamtraction/google-translate');
 const prisma = new PrismaClient();
@@ -16,7 +16,7 @@ type IValidatorMessage = {
     type: string
 };
 
-export default class RuleFactory {
+export class RuleFactory {
 
     constructor () {}
 
@@ -35,13 +35,21 @@ export default class RuleFactory {
                 const ruleTypeClassify = await Threatment.getInstance().classifyRuleType(outerMessage.type);
                 if (chainingType !== null && ruleTypeClassify !== null) {
                     const [elementToValidate, validation] = this.searchForElements(message.toLowerCase());   
-                    await prisma.rule.create({
-                        data: {
+                    await prisma.rule.upsert({
+                        create: {
                             chainingTypeId: chainingType[0].id,
                             ruleTypeId: ruleTypeClassify.id,
                             basedElement: elementToValidate,
                             description: messageTranslated,
                             validationElement: validation
+                        },
+                        update: {},
+                        where: {
+                            chainingTypeId_basedElement_validationElement: {
+                                chainingTypeId: chainingType[0].id,
+                                basedElement: elementToValidate,
+                                validationElement: validation
+                            }
                         },
                     });
                 }
