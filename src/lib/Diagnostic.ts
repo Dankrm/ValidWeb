@@ -1,4 +1,3 @@
-import { PrismaClient } from '@prisma/client';
 import { 
 	createHash
  } from 'crypto';
@@ -7,9 +6,7 @@ import Rule from './Rule';
 import { Threatment } from './Threatment';
 import { Validator } from './Validator';
 import { ValidatorFactory } from './ValidatorFactory';
-
-const prisma = new PrismaClient();
-
+import { prisma } from '../extension';
 export class Diagnostic {
 	private static instance: Diagnostic;
 	private diagnostics: Map<string, vscode.Diagnostic[]> = new Map();

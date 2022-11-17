@@ -1,8 +1,8 @@
 import NuRequest from "./NuRequest";
 import Rule from "./Rule";
 import { RuleFactory } from "./RuleFactory";
-import { PrismaClient, Prisma, RuleType, ChainingType } from '@prisma/client';
-const prisma = new PrismaClient();
+import { Prisma, RuleType, ChainingType } from '@prisma/client';
+import { prisma } from '../extension';
 
 export class Threatment {
     private static instance: Threatment;

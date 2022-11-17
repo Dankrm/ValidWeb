@@ -1,8 +1,7 @@
-import { PrismaClient } from '@prisma/client';
 import * as vscode from 'vscode';
 import Rule from './Rule';
 import { ValidatorFactory } from './ValidatorFactory';
-const prisma = new PrismaClient();
+import { prisma } from '../extension';
 
 export class DiagnosticCodeActionProvider implements vscode.CodeActionProvider {
 	

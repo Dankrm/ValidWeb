@@ -1,9 +1,8 @@
 
 import * as vscode from 'vscode';
 
-import { PrismaClient } from '@prisma/client';
 import { Diagnostic } from './lib/Diagnostic';
-const prisma = new PrismaClient();
+import { prisma } from './extension';
 
 export class SidebarRuleTypesProvider implements vscode.WebviewViewProvider {
 

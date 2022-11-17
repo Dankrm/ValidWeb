@@ -1,9 +1,8 @@
 import ConcreteRule from "./Rule";
 import Rule from "./Rule";
 import { Threatment } from "./Threatment";
-import { PrismaClient } from "@prisma/client";
 const translate = require('@iamtraction/google-translate');
-const prisma = new PrismaClient();
+import { prisma } from '../extension';
 
 type IValidatorMessage = {
     extract: string

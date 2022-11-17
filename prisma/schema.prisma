@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./validweb.sqlite"
+  url      = "file:../src/validweb.sqlite"
 }
 
 model ChainingType {
