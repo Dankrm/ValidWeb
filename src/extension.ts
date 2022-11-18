@@ -126,9 +126,10 @@ async function updatePrismaDataSource(context: vscode.ExtensionContext) {
 	});
 }
 
-
 export const load = async (context: vscode.ExtensionContext) => {
+	debugger
 	try {	
+		await vscode.workspace.fs.writeFile(vscode.Uri.parse(context.globalStorageUri.path + '/' + 'validweb.sqlite'), new Uint8Array());
 		new sqlite3.Database(context.globalStorageUri.fsPath + '/' + 'validweb.sqlite', sqlite3.OPEN_CREATE | sqlite3.OPEN_READWRITE);
 		await prisma.$executeRaw(
 			Prisma.sql `
@@ -192,70 +193,73 @@ export const load = async (context: vscode.ExtensionContext) => {
 };
 
 export async function activate(context: vscode.ExtensionContext) {
-	await updatePrismaDataSource(context);
+	try {
+		const filesTreeView = new TreeViewProvider((vscode.workspace.workspaceFolders) 
+		? vscode.workspace.workspaceFolders[0].uri.fsPath 
+		: undefined);
 
-	if (context.globalState.get('validweb.initializated') === undefined) {
-		await load(context);
-		context.globalState.update('validweb.initializated', true);
+		context.subscriptions.push(
+			vscode.window.registerTreeDataProvider('validweb-sidebar-tree', 
+				filesTreeView
+			)
+		);
+
+		vscode.commands.registerCommand('validweb.refreshFiles', () => {
+			filesTreeView.refresh();
+		});
+
+		const report = new Report();
+		vscode.commands.registerCommand('validweb.generateFileReport', async (localContext) => {
+			await vscode.window.withProgress({
+				location: vscode.ProgressLocation.Notification,
+				cancellable: true
+			}, async (progress) => {
+				progress.report({
+					message: `Carregando PDF ...`,
+				});
+				await report.generateForFile(localContext.resourceUri);
+			});
+		});
+
+		vscode.commands.registerCommand('validweb.generateFolderReport', async (localContext) => {
+			await vscode.window.withProgress({
+				location: vscode.ProgressLocation.Notification,
+				cancellable: true
+			}, async (progress) => {
+				progress.report({
+					message: `Carregando PDF ...`,
+				});
+				await report.generateForFolder(localContext);
+			});
+		});
+
+		await updatePrismaDataSource(context);
+		if (context.globalState.get('validweb.initializated') === undefined) {
+			await load(context);
+			context.globalState.update('validweb.initializated', true);
+		}
+
+		await Diagnostic.getInstance().subscribeToDocumentChanges(context);
+
+		const provider = new SidebarRuleTypesProvider(context);
+		context.subscriptions.push(
+			vscode.window.registerWebviewViewProvider(SidebarRuleTypesProvider.viewType, provider)
+		);	
+		
+		const providerRules = new SidebarRulesProvider(context);
+		context.subscriptions.push(
+			vscode.window.registerWebviewViewProvider(SidebarRulesProvider.viewType, providerRules)
+		);
+
+		context.subscriptions.push(
+			vscode.languages.registerCodeActionsProvider({ scheme: 'file', language: 'html' }, new DiagnosticCodeActionProvider(), {
+				providedCodeActionKinds: DiagnosticCodeActionProvider.providedCodeActionKinds
+			})
+		);
+	} catch (err) {
+		vscode.window.showErrorMessage('Erro de Inicialização:');
+		console.error(err);
 	}
-
-	await Diagnostic.getInstance().subscribeToDocumentChanges(context);
-
-	const provider = new SidebarRuleTypesProvider(context);
-	context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider(SidebarRuleTypesProvider.viewType, provider)
-	);	
-	
-	const providerRules = new SidebarRulesProvider(context);
-	context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider(SidebarRulesProvider.viewType, providerRules)
-	);
-
-	context.subscriptions.push(
-		vscode.languages.registerCodeActionsProvider({ scheme: 'file', language: 'html' }, new DiagnosticCodeActionProvider(), {
-			providedCodeActionKinds: DiagnosticCodeActionProvider.providedCodeActionKinds
-		})
-	);
-
-	const filesTreeView = new TreeViewProvider((vscode.workspace.workspaceFolders) 
-	? vscode.workspace.workspaceFolders[0].uri.fsPath 
-	: undefined);
-
-	context.subscriptions.push(
-		vscode.window.registerTreeDataProvider('validweb-sidebar-tree', 
-			filesTreeView
-		)
-	);
-
-	vscode.commands.registerCommand('validweb.refreshFiles', () => {
-		filesTreeView.refresh();
-	});
-
-	const report = new Report();
-	vscode.commands.registerCommand('validweb.generateFileReport', async (localContext) => {
-		await vscode.window.withProgress({
-			location: vscode.ProgressLocation.Notification,
-			cancellable: true
-		}, async (progress) => {
-			progress.report({
-				message: `Carregando PDF ...`,
-			});
-			await report.generateForFile(localContext.resourceUri);
-		});
-	});
-
-	vscode.commands.registerCommand('validweb.generateFolderReport', async (localContext) => {
-		await vscode.window.withProgress({
-			location: vscode.ProgressLocation.Notification,
-			cancellable: true
-		}, async (progress) => {
-			progress.report({
-				message: `Carregando PDF ...`,
-			});
-			await report.generateForFolder(localContext);
-		});
-	});
-	
 }
 
 export async function deactivate(context: vscode.ExtensionContext) {
