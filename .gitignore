@@ -109,3 +109,5 @@ out/
 .vscode-test/
 
 package-lock.json
+
+*.vsix

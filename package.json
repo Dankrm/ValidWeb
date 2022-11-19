@@ -3,7 +3,7 @@
   "displayName": "ValidWeb",
   "publisher": "Dankm",
   "description": "",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.72.0"
   },

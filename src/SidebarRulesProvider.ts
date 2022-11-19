@@ -8,7 +8,7 @@ export class SidebarRulesProvider implements vscode.WebviewViewProvider {
 
 	public static readonly viewType = 'validweb-sidebar-rules';
 
-	private _view?: vscode.WebviewView;
+	public static _view?: vscode.WebviewView;
 
 	constructor(
 		private readonly extensionContext: vscode.ExtensionContext,
@@ -19,7 +19,7 @@ export class SidebarRulesProvider implements vscode.WebviewViewProvider {
 		context: vscode.WebviewViewResolveContext,
 		_token: vscode.CancellationToken,
 	) {
-		this._view = webviewView;
+		SidebarRulesProvider._view = webviewView;
 
 		webviewView.webview.options = {
 			// Allow scripts in the webview
@@ -35,12 +35,7 @@ export class SidebarRulesProvider implements vscode.WebviewViewProvider {
 		webviewView.webview.onDidReceiveMessage(async (data) => {
 			switch (data.type) {
 				case "loadRules": {
-					const rules = await prisma.rule.findMany();
-					webviewView.webview.postMessage(
-						{
-							type: "loadedRules",
-							rules: rules
-						});
+					SidebarRulesProvider.loadRules();
 					break;
 				}
 				case "changeVisibilityRules": {
@@ -92,5 +87,14 @@ export class SidebarRulesProvider implements vscode.WebviewViewProvider {
 				<script src="${reactAppPathOnDisk}"></script>
 			</body>
 			</html>`;
+	}
+
+	public static async loadRules() {
+		const rules = await prisma.rule.findMany();
+		SidebarRulesProvider._view?.webview.postMessage(
+			{
+				type: "loadedRules",
+				rules: rules
+			});
 	}
 }

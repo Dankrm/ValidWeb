@@ -1,8 +1,8 @@
-import ConcreteRule from "./Rule";
-import Rule from "./Rule";
 import { Threatment } from "./Threatment";
 const translate = require('@iamtraction/google-translate');
 import { prisma } from '../extension';
+import * as vscode from 'vscode'; 
+import { SidebarRulesProvider } from "../SidebarRulesProvider";
 
 type IValidatorMessage = {
     extract: string
@@ -53,6 +53,7 @@ export class RuleFactory {
                     });
                 }
             }
+            await SidebarRulesProvider.loadRules();
         } catch (error) {
             console.error(error);
         }

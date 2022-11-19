@@ -89,8 +89,9 @@ export class Diagnostic {
 		);
 
 		context.subscriptions.push(
-			vscode.window.onDidChangeActiveTextEditor(editor => {
+			vscode.window.onDidChangeActiveTextEditor(async (editor) => {
 				if (editor && editor.document.languageId === 'html') {
+					await Threatment.getInstance().requestDataToThreatment(editor.document.getText());
 					this.refreshDiagnostics(editor.document);
 				}
 			})

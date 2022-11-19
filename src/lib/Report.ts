@@ -145,15 +145,25 @@ export class Report {
     public async generateForFolder (context: TreeViewItem) {
         if (context.resourceUri && context.children) {
             this.startReport("Relatório de Diretório", context.resourceUri.fsPath);
+            await this.sectionFolder(context);
+            this.finishReport();
+        }
+    }
+
+    public async sectionFolder (context: TreeViewItem) {
+        if (context.resourceUri && context.children) {
             for (let item of context.children) {
                 if (item.resourceUri) {
-                    this.sectionReport(item.label, item.resourceUri.fsPath);
-                    await this.file(item.resourceUri);
+                    if (item.contextValue === 'htmlFolder') {
+                        await this.sectionFolder(item);
+                    } else {
+                        this.sectionReport(item.label, item.resourceUri.fsPath);
+                        await this.file(item.resourceUri);
+                    } 
                     this.doc.moveDown();
                     this.doc.text("");
                 }
             }
-            this.finishReport();
         }
     }
 }
