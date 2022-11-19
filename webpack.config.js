@@ -5,12 +5,12 @@ module.exports = {
     build: "./src/app/index.tsx",
   },
   output: {
-    path: path.resolve(__dirname, "out"),
+    path: path.resolve(__dirname, "dist", "src"),
     filename: "[name].js"
   },
-  devtool: "eval-source-map",
+  devtool: "source-map",
   resolve: {
-    extensions: [".js", ".ts", ".tsx", ".json"]
+    extensions: [".js", ".ts", ".tsx", ".json"],
   },
   module: {
     rules: [

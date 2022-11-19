@@ -67,7 +67,7 @@ export class SidebarRulesProvider implements vscode.WebviewViewProvider {
 		const styleVSCodeUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionContext.extensionUri, 'media', 'vscode.css'));
 		
 		const reactAppPathOnDisk = webview.asWebviewUri(
-			vscode.Uri.joinPath(this.extensionContext.extensionUri, 'out', 'build.js')
+			vscode.Uri.joinPath(this.extensionContext.extensionUri, 'dist', 'src', 'build.js')
 		);
 
 		return `<!DOCTYPE html>

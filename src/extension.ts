@@ -127,7 +127,6 @@ async function updatePrismaDataSource(context: vscode.ExtensionContext) {
 }
 
 export const load = async (context: vscode.ExtensionContext) => {
-	debugger
 	try {	
 		await vscode.workspace.fs.writeFile(vscode.Uri.parse(context.globalStorageUri.path + '/' + 'validweb.sqlite'), new Uint8Array());
 		new sqlite3.Database(context.globalStorageUri.fsPath + '/' + 'validweb.sqlite', sqlite3.OPEN_CREATE | sqlite3.OPEN_READWRITE);
@@ -204,37 +203,49 @@ export async function activate(context: vscode.ExtensionContext) {
 			)
 		);
 
-		vscode.commands.registerCommand('validweb.refreshFiles', () => {
-			filesTreeView.refresh();
-		});
+		context.subscriptions.push(
+			vscode.commands.registerCommand('validweb.refreshFiles', () => {
+				filesTreeView.refresh();
+			})
+		);
 
 		const report = new Report();
-		vscode.commands.registerCommand('validweb.generateFileReport', async (localContext) => {
-			await vscode.window.withProgress({
-				location: vscode.ProgressLocation.Notification,
-				cancellable: true
-			}, async (progress) => {
-				progress.report({
-					message: `Carregando PDF ...`,
+		context.subscriptions.push(
+			vscode.commands.registerCommand('validweb.generateFileReport', async (localContext) => {
+				await vscode.window.withProgress({
+					location: vscode.ProgressLocation.Notification,
+					cancellable: true
+				}, async (progress) => {
+					progress.report({
+						message: `Carregando PDF ...`,
+					});
+					await report.generateForFile(localContext.resourceUri);
 				});
-				await report.generateForFile(localContext.resourceUri);
-			});
-		});
+			})
+		);
 
-		vscode.commands.registerCommand('validweb.generateFolderReport', async (localContext) => {
-			await vscode.window.withProgress({
-				location: vscode.ProgressLocation.Notification,
-				cancellable: true
-			}, async (progress) => {
-				progress.report({
-					message: `Carregando PDF ...`,
+		context.subscriptions.push(
+			vscode.commands.registerCommand('validweb.generateFolderReport', async (localContext) => {
+				await vscode.window.withProgress({
+					location: vscode.ProgressLocation.Notification,
+					cancellable: true
+				}, async (progress) => {
+					progress.report({
+						message: `Carregando PDF ...`,
+					});
+					await report.generateForFolder(localContext);
 				});
-				await report.generateForFolder(localContext);
-			});
-		});
+			})
+		);
 
-		await updatePrismaDataSource(context);
-		if (context.globalState.get('validweb.initializated') === undefined) {
+		try {
+			await updatePrismaDataSource(context);
+			if (context.globalState.get('validweb.initializated') === undefined) {
+				await load(context);
+				context.globalState.update('validweb.initializated', true);
+			}
+			await vscode.workspace.fs.stat(vscode.Uri.parse(context.globalStorageUri.path + '/' + 'validweb.sqlite'));
+		} catch (err) {
 			await load(context);
 			context.globalState.update('validweb.initializated', true);
 		}
@@ -258,7 +269,9 @@ export async function activate(context: vscode.ExtensionContext) {
 		);
 	} catch (err) {
 		vscode.window.showErrorMessage('Erro de Inicialização:');
-		console.error(err);
+		if (err) {
+			vscode.window.showErrorMessage(String(err));
+		}
 	}
 }
 

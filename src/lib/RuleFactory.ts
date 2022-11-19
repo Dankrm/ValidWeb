@@ -32,7 +32,7 @@ export class RuleFactory {
                 const messageTranslated = (await translate(message, {from: 'en', to: 'pt'})).text;
                 const chainingType = await Threatment.getInstance().classifyMessage(String(message).toLocaleLowerCase());
                 const ruleTypeClassify = await Threatment.getInstance().classifyRuleType(outerMessage.type);
-                if (chainingType !== null && ruleTypeClassify !== null) {
+                if (chainingType && chainingType[0] !== undefined && ruleTypeClassify !== null) {
                     const [elementToValidate, validation] = this.searchForElements(message.toLowerCase());   
                     await prisma.rule.upsert({
                         create: {
