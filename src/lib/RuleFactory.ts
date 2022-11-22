@@ -1,7 +1,6 @@
 import { Threatment } from "./Threatment";
 const translate = require('@iamtraction/google-translate');
 import { prisma } from '../extension';
-import * as vscode from 'vscode'; 
 import { SidebarRulesProvider } from "../SidebarRulesProvider";
 
 type IValidatorMessage = {

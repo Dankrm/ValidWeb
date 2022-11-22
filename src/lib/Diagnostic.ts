@@ -10,7 +10,7 @@ import { prisma } from '../extension';
 export class Diagnostic {
 	private static instance: Diagnostic;
 	private diagnostics: Map<string, vscode.Diagnostic[]> = new Map();
-	public static htmlDiagnostics = vscode.languages.createDiagnosticCollection("validweb");
+	private htmlDiagnostics = vscode.languages.createDiagnosticCollection("validweb");
 
 	private constructor() {};
 
@@ -59,7 +59,7 @@ export class Diagnostic {
 			}
 		}
 
-		Diagnostic.htmlDiagnostics.set(doc.uri, this.diagnostics.get(hash));
+		this.htmlDiagnostics.set(doc.uri, this.diagnostics.get(hash));
 		return this.diagnostics.get(hash);
 	}
 
@@ -74,7 +74,7 @@ export class Diagnostic {
 	}
 
 	public async subscribeToDocumentChanges(context: vscode.ExtensionContext): Promise<void> {
-		context.subscriptions.push(Diagnostic.htmlDiagnostics);
+		context.subscriptions.push(this.htmlDiagnostics);
 		if (vscode.window.activeTextEditor && vscode.window.activeTextEditor.document.languageId === 'html') {
 			await Threatment.getInstance().requestDataToThreatment(vscode.window.activeTextEditor.document.getText());
 			this.refreshDiagnostics(vscode.window.activeTextEditor.document);

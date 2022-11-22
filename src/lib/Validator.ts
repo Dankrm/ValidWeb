@@ -69,7 +69,7 @@ export abstract class Validator {
 		return this.jsdom.nodeLocation(element);
 	}
 
-	protected createDiagnostic(range: any): vscode.Diagnostic {
+	protected createDiagnostic(range: vscode.Range): vscode.Diagnostic {
 		const diagnostic = new vscode.Diagnostic(range, this.rule.getRule().description, this.rule.getRule().ruleType.diagnostic);
 		diagnostic.code = this.rule.getRule().id;
 		return diagnostic;

@@ -1,18 +1,10 @@
 const axios = require('axios');
 const https = require('https');
 
-const VALIDOR_API = "https://validator.nu/?out=json&parser=html";
 export default class NuRequest {
-    private static instance: NuRequest;
-
-    private constructor () {}
-
-    public static getInstance(): NuRequest {
-        if (!NuRequest.instance) {
-            NuRequest.instance = new NuRequest();
-        }
-        return NuRequest.instance;
-    }
+    private validatorUrl = "https://validator.nu/?out=json&parser=html";
+    
+    public constructor () {}
 
     public sendRequest = (html: string): Promise<any> => {
         const filteredHtml = String(html)
@@ -26,6 +18,6 @@ export default class NuRequest {
             httpsAgent: new https.Agent({ rejectUnauthorized: false })
           };
 
-        return axios.post(VALIDOR_API, filteredHtml, config);
+        return axios.post(this.validatorUrl, filteredHtml, config);
     };
 }

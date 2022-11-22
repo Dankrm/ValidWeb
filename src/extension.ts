@@ -18,18 +18,6 @@ const chainingTypes = [
 		invalidation: "x$"
 	},
 	{
-		chain: "emptyContent",
-		selector: "content",
-		messageCode: "empty heading",
-		invalidation: "x$content"
-	},
-	{
-		chain: "emptyContent",
-		selector: "content",
-		messageCode: "must not be empty",
-		invalidation: "x$content"
-	},
-	{
 		chain: "children",
 		selector: ">",
 		messageCode: "must not appear as a descendant of the",
@@ -88,6 +76,18 @@ const chainingTypes = [
 		selector: "content",
 		messageCode: "end of file seen without seeing a doctype first. expected",
 		invalidation: "$x"
+	},
+	{
+		chain: "emptyContent",
+		selector: "content",
+		messageCode: "empty heading",
+		invalidation: "x$content"
+	},
+	{
+		chain: "emptyContent",
+		selector: "content",
+		messageCode: "must not be empty",
+		invalidation: "x$content"
 	},
 	{
 		chain: "undefined",
