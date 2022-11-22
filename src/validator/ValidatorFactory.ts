@@ -1,4 +1,4 @@
-import Rule from "./Rule";
+import Rule from "../lib/Rule";
 import { ValidateAttributes } from "./ValidateAttributes";
 import { ValidateChildren } from "./ValidateChildren";
 import { ValidateClosing } from "./ValidateClosing";

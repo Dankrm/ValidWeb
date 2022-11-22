@@ -1,4 +1,4 @@
-import { Threatment } from "./Threatment";
+import { Threatment } from "../threatment/Threatment";
 const translate = require('@iamtraction/google-translate');
 import { prisma } from '../extension';
 import { SidebarRulesProvider } from "../SidebarRulesProvider";

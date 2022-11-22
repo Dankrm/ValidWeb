@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import Rule from './Rule';
-import { ValidatorFactory } from './ValidatorFactory';
+import { ValidatorFactory } from '../validator/ValidatorFactory';
 import { prisma } from '../extension';
 
 export class DiagnosticCodeActionProvider implements vscode.CodeActionProvider {

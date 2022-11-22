@@ -1,5 +1,5 @@
 import NuRequest from "./NuRequest";
-import { RuleFactory } from "./RuleFactory";
+import { RuleFactory } from "../lib/RuleFactory";
 import { Prisma, RuleType, ChainingType } from '@prisma/client';
 import { prisma } from '../extension';
 

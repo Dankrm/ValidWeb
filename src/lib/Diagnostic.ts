@@ -3,9 +3,9 @@ import {
  } from 'crypto';
 import * as vscode from 'vscode';
 import Rule from './Rule';
-import { Threatment } from './Threatment';
-import { Validator } from './Validator';
-import { ValidatorFactory } from './ValidatorFactory';
+import { Threatment } from '../threatment/Threatment';
+import { Validator } from '../validator/Validator';
+import { ValidatorFactory } from '../validator/ValidatorFactory';
 import { prisma } from '../extension';
 export class Diagnostic {
 	private static instance: Diagnostic;

@@ -1,5 +1,5 @@
-import { Diagnostic } from "./Diagnostic";
-import Rule from "./Rule";
+import { Diagnostic } from "../lib/Diagnostic";
+import Rule from "../lib/Rule";
 import * as vscode from 'vscode';
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;

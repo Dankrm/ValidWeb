@@ -1,7 +1,6 @@
 import * as assert from 'assert';
 import * as vscode from 'vscode';
-import * as child_process from 'child_process';
-import { Threatment } from '../../../lib/Threatment';
+import { Threatment } from '../../../threatment/Threatment';
 import { PrismaClient } from "@prisma/client";
 import { before, describe, it } from 'mocha';
 const prisma = new PrismaClient();

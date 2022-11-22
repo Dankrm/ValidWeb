@@ -1,5 +1,3 @@
-import { CodeAction, TextDocument } from "vscode";
-import { Diagnostic } from "./Diagnostic";
 import * as vscode from 'vscode';
 import { Validator } from "./Validator";
 
