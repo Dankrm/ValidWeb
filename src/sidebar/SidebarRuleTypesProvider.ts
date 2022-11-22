@@ -1,8 +1,8 @@
 
 import * as vscode from 'vscode';
 
-import { Diagnostic } from './lib/Diagnostic';
-import { prisma } from './extension';
+import { Diagnostic } from '../lib/Diagnostic';
+import { prisma } from '../extension';
 
 export class SidebarRuleTypesProvider implements vscode.WebviewViewProvider {
 

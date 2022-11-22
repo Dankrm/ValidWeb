@@ -1,7 +1,7 @@
 import { Threatment } from "../threatment/Threatment";
 const translate = require('@iamtraction/google-translate');
 import { prisma } from '../extension';
-import { SidebarRulesProvider } from "../SidebarRulesProvider";
+import { SidebarRulesProvider } from "../sidebar/SidebarRulesProvider";
 
 type IValidatorMessage = {
     extract: string

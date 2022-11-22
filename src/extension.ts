@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
-import { SidebarRuleTypesProvider } from './SidebarRuleTypesProvider';
-import { SidebarRulesProvider } from './SidebarRulesProvider';
+import { SidebarRuleTypesProvider } from './sidebar/SidebarRuleTypesProvider';
+import { SidebarRulesProvider } from './sidebar/SidebarRulesProvider';
 import { DiagnosticCodeActionProvider } from './lib/DiagnosticCodeActionProvider';
 import { Diagnostic } from './lib/Diagnostic';
-import { TreeViewProvider } from './treeView/TreeViewProvider';
+import { TreeViewProvider } from './directoriesTreeView/TreeViewProvider';
 import { Report } from './lib/Report';
 import * as sqlite3 from 'sqlite3';
 import { Prisma, PrismaClient } from '@prisma/client';

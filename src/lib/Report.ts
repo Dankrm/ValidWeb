@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as os from 'os';
 import { Diagnostic } from './Diagnostic';
-import { TreeViewItem } from '../treeView/TreeViewItem';
+import { TreeViewItem } from '../directoriesTreeView/TreeViewItem';
 const pdfDocument = require('pdfkit');
 
 
