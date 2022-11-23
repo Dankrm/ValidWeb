@@ -51,7 +51,6 @@ export class SidebarRulesProvider implements vscode.WebviewViewProvider {
 						Diagnostic.getInstance().refreshDiagnostics(vscode.window.activeTextEditor.document);
 					break;
 				}
-				
 			}
 		  });
 	}
