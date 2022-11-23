@@ -4,7 +4,6 @@ import * as vscode from 'vscode';
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 
-export const errorMention = "html_error";
 export abstract class Validator {
     protected abstract chain: string;
     protected abstract ignoredChars: string[];
